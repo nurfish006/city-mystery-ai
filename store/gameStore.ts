@@ -46,7 +46,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       return null
     }
 
-    const clue = gameEngine.getNextClue()
+    const clue = gameEngine.getCurrentClue()
     const gameState = gameEngine.getGameState()
     
     set({ currentClue: clue, gameState })

@@ -1,6 +1,7 @@
 'use client'
 
 import { useGameStore } from '@/store/gameStore'
+import { SCORING_CONFIG } from '@/lib/game/scoring'
 
 export function ClueCard() {
   const { currentClue, gameState, getNextClue, getRemainingClues } = useGameStore()
@@ -14,6 +15,8 @@ export function ClueCard() {
       </div>
     )
   }
+
+  const cluePenalty = gameState ? SCORING_CONFIG[gameState.difficulty].cluePenalty : 0
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
@@ -29,7 +32,7 @@ export function ClueCard() {
         </div>
       </div>
       
-      <p className="text-gray-700 text-lg mb-4 italic">"{currentClue}"</p>
+      <p className="text-gray-700 text-lg mb-4 italic">{currentClue}</p>
       
       <div className="flex justify-between items-center">
         <p className="text-sm text-gray-500">
@@ -41,7 +44,7 @@ export function ClueCard() {
             onClick={getNextClue}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
           >
-            Get Another Clue (-{gameState ? 20 : 0} points)
+            Get Another Clue (-{cluePenalty} points)
           </button>
         )}
       </div>

@@ -67,7 +67,7 @@ export default function PlayPage() {
             <ul className="text-blue-700 text-sm space-y-1">
               <li>• Guess early for maximum points</li>
               <li>• Each clue reduces your potential score</li>
-              <li>• Wrong guesses don't cost points, but limit attempts</li>
+              <li>• Wrong guesses dont cost points, but limit attempts</li>
               <li>• Perfect guess with first clue earns bonus!</li>
             </ul>
           </div>

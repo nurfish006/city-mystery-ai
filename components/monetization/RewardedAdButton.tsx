@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useMonetizationStore } from '@/store/gameStore'
+import { useMonetizationStore } from '@/store/monetizationStore'
 
 interface RewardedAdButtonProps {
   adType: 'clue' | 'continue' | 'bonus'
