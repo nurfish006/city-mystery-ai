@@ -1,0 +1,22 @@
+{
+  "cities": [
+    {
+      "name": "Addis Ababa",
+      "region": "Shewa",
+      "historicalSignificance": "Founded in 1886 by Emperor Menelik II",
+      "coordinates": {
+        "lat": 9.0320,
+        "lng": 38.7460
+      }
+    },
+    {
+      "name": "Lalibela",
+      "region": "Amhara", 
+      "historicalSignificance": "Famous for rock-hewn churches from 12th century",
+      "coordinates": {
+        "lat": 12.0317,
+        "lng": 39.0410
+      }
+    }
+  ]
+}

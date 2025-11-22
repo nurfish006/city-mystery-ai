@@ -1,0 +1,22 @@
+{
+  "cities": [
+    {
+      "name": "Paris",
+      "country": "France",
+      "continent": "Europe",
+      "coordinates": {
+        "lat": 48.8566,
+        "lng": 2.3522
+      }
+    },
+    {
+      "name": "Tokyo",
+      "country": "Japan", 
+      "continent": "Asia",
+      "coordinates": {
+        "lat": 35.6762,
+        "lng": 139.6503
+      }
+    }
+  ]
+}
