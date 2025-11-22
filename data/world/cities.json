@@ -4,19 +4,40 @@
       "name": "Paris",
       "country": "France",
       "continent": "Europe",
-      "coordinates": {
-        "lat": 48.8566,
-        "lng": 2.3522
-      }
+      "coordinates": { "lat": 48.8566, "lng": 2.3522 },
+      "clues": [
+        "I am known as the City of Light, where a famous iron tower kisses the sky.",
+        "My river banks are home to lovers and artists, flowing through the heart of Europe.",
+        "My language is the language of diplomacy, and my fashion sets global trends.",
+        "I host the world's most visited paid monument, standing 324 meters tall."
+      ],
+      "hints": ["france", "eiffel", "seine", "fashion"]
     },
     {
       "name": "Tokyo",
-      "country": "Japan", 
-      "continent": "Asia",
-      "coordinates": {
-        "lat": 35.6762,
-        "lng": 139.6503
-      }
+      "country": "Japan",
+      "continent": "Asia", 
+      "coordinates": { "lat": 35.6762, "lng": 139.6503 },
+      "clues": [
+        "I am a neon-lit metropolis where ancient temples meet cutting-edge technology.",
+        "My crossing is the world's busiest, a synchronized dance of pedestrians.",
+        "I was once called Edo, and my fish market is legendary worldwide.",
+        "My tallest tower stands 634 meters and is painted white and orange."
+      ],
+      "hints": ["japan", "shibuya", "sushi", "skytree"]
+    },
+    {
+      "name": "New York",
+      "country": "USA",
+      "continent": "North America",
+      "coordinates": { "lat": 40.7128, "lng": -74.0060 },
+      "clues": [
+        "I'm the city that never sleeps, with a park larger than some countries.",
+        "My lady stands tall in the harbor, welcoming millions to the land of opportunity.",
+        "My theater district is world-famous, and my pizza is folded, not forked.",
+        "I have five boroughs, but one is an island known for finance and a charging bull."
+      ],
+      "hints": ["usa", "statue of liberty", "central park", "manhattan"]
     }
   ]
 }
