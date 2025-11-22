@@ -1,6 +1,6 @@
 'use client'
 
-import { useMonetizationStore } from '@/store/gameStore'
+import { useMonetizationStore } from '@/store/monetizationStore'
 import { RewardedAdButton } from '@/components/monetization/RewardedAdButton'
 
 export default function TestMonetizationPage() {
