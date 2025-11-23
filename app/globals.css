@@ -120,6 +120,31 @@
     @apply bg-background text-foreground;
   }
 }
+
+@import 'leaflet/dist/leaflet.css';
+
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  border-radius: 0.5rem;
+}
+
+/* Blur overlay styles */
+.blur-overlay {
+  pointer-events: none !important;
+  mix-blend-mode: overlay;
+}
+
+/* Smooth transitions for map elements */
+.leaflet-map-blur {
+  transition: filter 0.3s ease-in-out;
+}
+
+/* Fix for map container */
+.map-container {
+  position: relative;
+  overflow: hidden;
+}
 /* Leaflet map styles */
 .leaflet-container {
   height: 100%;

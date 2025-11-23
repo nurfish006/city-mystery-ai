@@ -1,6 +1,8 @@
 import { City, getRandomCity } from '@/lib/utils/citySelect'
 import { calculateScore, SCORING_CONFIG } from '@/lib/game/scoring'
 import { validateGuess, ValidationResult } from '@/lib/utils/validateGuess'
+import { generateMapOffset, calculateMapReveal } from '@/lib/game/mapUtils'
+import { Coordinates } from '@/lib/utils/coordinates'
 
 export interface GameState {
   targetCity: City
@@ -12,6 +14,14 @@ export interface GameState {
   isGameOver: boolean
   isGameWon: boolean
   difficulty: keyof typeof SCORING_CONFIG
+  // NEW: Map-related state
+  mapCenter: Coordinates
+  mapOffset: { latOffset: number; lngOffset: number }
+  mapReveal: {
+    blurIntensity: number
+    revealPercentage: number
+    isFullyRevealed: boolean
+  }
 }
 
 export class GameEngine {
@@ -23,6 +33,10 @@ export class GameEngine {
 
   private initializeGame(difficulty: keyof typeof SCORING_CONFIG): GameState {
     const targetCity = getRandomCity()
+    const mapOffset = generateMapOffset()
+    
+    // Calculate initial map reveal state
+    const mapReveal = calculateMapReveal(0, targetCity.clues.length)
     
     return {
       targetCity,
@@ -33,20 +47,33 @@ export class GameEngine {
       maxPossibleScore: SCORING_CONFIG[difficulty].basePoints,
       isGameOver: false,
       isGameWon: false,
-      difficulty
+      difficulty,
+      // Map state
+      mapCenter: {
+        lat: targetCity.coordinates.lat + mapOffset.latOffset,
+        lng: targetCity.coordinates.lng + mapOffset.lngOffset
+      },
+      mapOffset,
+      mapReveal
     }
   }
 
   getCurrentClue(): string | null {
     if (this.state.currentClueIndex >= this.state.targetCity.clues.length) {
-      return null // No more clues available
+      return null
     }
     
     const clue = this.state.targetCity.clues[this.state.currentClueIndex]
     this.state.usedClues.push(clue)
     this.state.currentClueIndex++
     
-    // Update max possible score based on clues used
+    // UPDATE: Recalculate map reveal with new clue
+    this.state.mapReveal = calculateMapReveal(
+      this.state.currentClueIndex, 
+      this.state.targetCity.clues.length
+    )
+    
+    // Update max possible score
     this.state.maxPossibleScore = SCORING_CONFIG[this.state.difficulty].basePoints - 
       (this.state.currentClueIndex * SCORING_CONFIG[this.state.difficulty].cluePenalty)
     
@@ -73,6 +100,13 @@ export class GameEngine {
         this.state.attempts,
         wasPerfect
       )
+
+      // Fully reveal the map when game is won
+      this.state.mapReveal = {
+        blurIntensity: 0,
+        revealPercentage: 100,
+        isFullyRevealed: true
+      }
     }
 
     // Game over after 5 attempts
@@ -90,6 +124,16 @@ export class GameEngine {
 
   getGameState(): GameState {
     return { ...this.state } // Return copy to prevent direct mutation
+  }
+
+  // NEW: Get map state
+  getMapState() {
+    return {
+      center: this.state.mapCenter,
+      offset: this.state.mapOffset,
+      reveal: this.state.mapReveal,
+      actualCityCoordinates: this.state.targetCity.coordinates
+    }
   }
 
   startNewGame(difficulty: keyof typeof SCORING_CONFIG = 'medium'): GameState {
