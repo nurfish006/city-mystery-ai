@@ -5,12 +5,12 @@ import { useGameStore } from '@/store/gameStore'
 import { ClueCard } from '@/components/game/ClueCard'
 import { GuessInput } from '@/components/game/GuessInput'
 import { ScorePanel } from '@/components/game/ScorePanel'
+import { MapPreview } from '@/components/game/MapPreview' // NEW
 
 export default function PlayPage() {
   const { initializeGame, gameState } = useGameStore()
 
   useEffect(() => {
-    // Initialize game when component mounts
     if (!gameState) {
       initializeGame('medium')
     }
@@ -21,7 +21,7 @@ export default function PlayPage() {
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-gray-800 mb-2">City Mystery Explorer</h1>
         <p className="text-gray-600">
-          Uncover the hidden city through cryptic clues. Choose wisely - each clue costs points!
+          Uncover the hidden city through cryptic clues and mysterious maps!
         </p>
       </div>
 
@@ -58,17 +58,20 @@ export default function PlayPage() {
 
         {/* Right Column - Gameplay */}
         <div className="lg:col-span-2 space-y-6">
+          {/* NEW: Map Preview at the top */}
+          <MapPreview />
+          
           <ClueCard />
           <GuessInput />
           
-          {/* Game Tips */}
+          {/* Enhanced Game Tips */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <h4 className="font-semibold text-blue-800 mb-2">💡 Pro Tips</h4>
             <ul className="text-blue-700 text-sm space-y-1">
-              <li>• Guess early for maximum points</li>
-              <li>• Each clue reduces your potential score</li>
-              <li>• Wrong guesses dont cost points, but limit attempts</li>
-              <li>• Perfect guess with first clue earns bonus!</li>
+              <li>• Use both text clues AND map features to guess</li>
+              <li>• Maps reveal more details with each clue</li>
+              <li>• Look for coastlines, mountain ranges, and city density</li>
+              <li>• Early guesses with partial maps earn bonus points!</li>
             </ul>
           </div>
         </div>

@@ -2,6 +2,19 @@ import { create } from 'zustand'
 import { GameEngine, GameState } from '@/lib/game/gameEngine'
 import { ValidationResult } from '@/lib/utils/validateGuess'
 
+// Add this if missing - scoring config interface
+interface ScoringConfig {
+  maxScore: number
+  cluePenalty: number
+  attemptPenalty: number
+}
+
+const SCORING_CONFIG = {
+  easy: { maxScore: 1000, cluePenalty: 50, attemptPenalty: 20 },
+  medium: { maxScore: 1500, cluePenalty: 75, attemptPenalty: 30 },
+  hard: { maxScore: 2000, cluePenalty: 100, attemptPenalty: 40 }
+} as const
+
 interface GameStoreState {
   // Game Engine
   gameEngine: GameEngine | null
@@ -23,6 +36,14 @@ interface GameStoreState {
   submitGuess: (guess: string) => ValidationResult
   startNewGame: (difficulty?: keyof typeof SCORING_CONFIG) => void
   getRemainingClues: () => number
+  
+  // Map action 
+  getMapState: () => {
+    center: { lat: number; lng: number }
+    offset: { latOffset: number; lngOffset: number }
+    reveal: { blurIntensity: number; revealPercentage: number; isFullyRevealed: boolean }
+    actualCityCoordinates: { lat: number; lng: number }
+  } | null
 }
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
@@ -99,5 +120,11 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   getRemainingClues: () => {
     const { gameEngine } = get()
     return gameEngine ? gameEngine.getRemainingClues() : 0
+  },
+
+  // Get map state - fixed syntax
+  getMapState: () => {
+    const { gameEngine } = get()
+    return gameEngine ? gameEngine.getMapState() : null
   }
 }))
