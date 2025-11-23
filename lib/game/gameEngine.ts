@@ -3,6 +3,7 @@ import { calculateScore, SCORING_CONFIG } from '@/lib/game/scoring'
 import { validateGuess, ValidationResult } from '@/lib/utils/validateGuess'
 import { generateMapOffset, calculateMapReveal } from '@/lib/game/mapUtils'
 import { Coordinates } from '@/lib/utils/coordinates'
+import { clueManager, ClueGenerationResult, GameMode } from '@/lib/ai/clueManager'
 
 export interface GameState {
   targetCity: City
@@ -14,6 +15,9 @@ export interface GameState {
   isGameOver: boolean
   isGameWon: boolean
   difficulty: keyof typeof SCORING_CONFIG
+  gameMode: GameMode // 'world' | 'ethiopia'
+  clueMode: 'ai' | 'offline'
+  // Map state
   mapCenter: Coordinates
   mapOffset: { latOffset: number; lngOffset: number }
   mapReveal: {
@@ -26,12 +30,12 @@ export interface GameState {
 export class GameEngine {
   private state: GameState
 
-  constructor(difficulty: keyof typeof SCORING_CONFIG = 'medium') {
-    this.state = this.initializeGame(difficulty)
+  constructor(difficulty: keyof typeof SCORING_CONFIG = 'medium', gameMode: GameMode = 'world') {
+    this.state = this.initializeGame(difficulty, gameMode)
     this.provideFirstClue()
   }
 
-  private initializeGame(difficulty: keyof typeof SCORING_CONFIG): GameState {
+  private initializeGame(difficulty: keyof typeof SCORING_CONFIG, gameMode: GameMode): GameState {
     const targetCity = getRandomCity()
     const mapOffset = generateMapOffset()
     
@@ -41,6 +45,7 @@ export class GameEngine {
     console.log('🎮 Game initialized:', {
       city: targetCity.name,
       totalClues: targetCity.clues.length,
+      gameMode,
       initialBlur: mapReveal.blurIntensity
     })
     
@@ -54,6 +59,8 @@ export class GameEngine {
       isGameOver: false,
       isGameWon: false,
       difficulty,
+      gameMode,
+      clueMode: 'offline', // Will be updated when first clue is generated
       mapCenter: {
         lat: targetCity.coordinates.lat + mapOffset.latOffset,
         lng: targetCity.coordinates.lng + mapOffset.lngOffset
@@ -63,57 +70,94 @@ export class GameEngine {
     }
   }
 
-  private provideFirstClue(): void {
+  private async provideFirstClue(): Promise<void> {
     // First clue is free - no penalty, automatically provided
     if (this.state.targetCity.clues.length > 0) {
-      const firstClue = this.state.targetCity.clues[0]
-      this.state.usedClues.push(firstClue)
-      this.state.currentClueIndex = 1 // Now we're at first clue
-      
-      // Update map for first clue state
-      this.state.mapReveal = calculateMapReveal(1, this.state.targetCity.clues.length)
-      
-      console.log('🎁 First clue provided automatically:', {
-        clue: firstClue.substring(0, 50) + '...',
-        newIndex: this.state.currentClueIndex,
-        blur: this.state.mapReveal.blurIntensity
-      })
+      try {
+        // Use AI/Offline manager to generate first clue
+        const result: ClueGenerationResult = await clueManager.generateClue(
+          this.state.targetCity,
+          0, // First clue index
+          this.state.gameMode,
+          [] // No previous clues
+        )
+
+        this.state.usedClues.push(result.clue)
+        this.state.currentClueIndex = 1 // Now we're at first clue
+        this.state.clueMode = result.mode
+        
+        // Update map for first clue state
+        this.state.mapReveal = calculateMapReveal(1, this.state.targetCity.clues.length)
+        
+        console.log('🎁 First clue provided:', {
+          mode: result.mode,
+          clue: result.clue.substring(0, 50) + '...',
+          newIndex: this.state.currentClueIndex,
+          blur: this.state.mapReveal.blurIntensity
+        })
+      } catch (error) {
+        console.error('Failed to generate first clue:', error)
+        // Fallback to original first clue
+        const firstClue = this.state.targetCity.clues[0]
+        this.state.usedClues.push(firstClue)
+        this.state.currentClueIndex = 1
+        this.state.clueMode = 'offline'
+        this.state.mapReveal = calculateMapReveal(1, this.state.targetCity.clues.length)
+      }
     }
   }
 
-  getCurrentClue(): string | null {
+  async getCurrentClue(): Promise<string | null> {
     if (this.state.currentClueIndex >= this.state.targetCity.clues.length) {
       console.log('❌ No more clues available')
       return null
     }
-    
-    const clue = this.state.targetCity.clues[this.state.currentClueIndex]
-    this.state.usedClues.push(clue)
-    
-    console.log('🔍 Getting clue at index:', this.state.currentClueIndex)
-    
-    // Update map reveal with CURRENT index (before incrementing)
-    this.state.mapReveal = calculateMapReveal(
-      this.state.currentClueIndex, 
-      this.state.targetCity.clues.length
-    )
-    
-    // Increment index for next call
-    this.state.currentClueIndex++
-    
-    // Update max possible score (first clue was free, so subtract 1)
-    const effectiveCluesUsed = Math.max(0, this.state.currentClueIndex - 1)
-    this.state.maxPossibleScore = SCORING_CONFIG[this.state.difficulty].basePoints - 
-      (effectiveCluesUsed * SCORING_CONFIG[this.state.difficulty].cluePenalty)
-    
-    console.log('✅ Clue retrieved:', {
-      newIndex: this.state.currentClueIndex,
-      effectiveCluesUsed,
-      blurIntensity: this.state.mapReveal.blurIntensity,
-      revealPercentage: this.state.mapReveal.revealPercentage
-    })
-    
-    return clue
+
+    try {
+      // Use AI/Offline manager to generate clue
+      const result: ClueGenerationResult = await clueManager.generateClue(
+        this.state.targetCity,
+        this.state.currentClueIndex,
+        this.state.gameMode,
+        this.state.usedClues
+      )
+
+      this.state.usedClues.push(result.clue)
+      this.state.clueMode = result.mode // Update current mode
+      
+      console.log('🔍 Getting clue at index:', this.state.currentClueIndex, 'mode:', result.mode)
+      
+      // Update map reveal with CURRENT index (before incrementing)
+      this.state.mapReveal = calculateMapReveal(
+        this.state.currentClueIndex, 
+        this.state.targetCity.clues.length
+      )
+      
+      // Increment index for next call
+      this.state.currentClueIndex++
+      
+      // Update max possible score (first clue was free, so subtract 1)
+      const effectiveCluesUsed = Math.max(0, this.state.currentClueIndex - 1)
+      this.state.maxPossibleScore = SCORING_CONFIG[this.state.difficulty].basePoints - 
+        (effectiveCluesUsed * SCORING_CONFIG[this.state.difficulty].cluePenalty)
+      
+      console.log('✅ Clue retrieved:', {
+        newIndex: this.state.currentClueIndex,
+        effectiveCluesUsed,
+        blurIntensity: this.state.mapReveal.blurIntensity,
+        mode: this.state.clueMode
+      })
+      
+      return result.clue
+    } catch (error) {
+      console.error('Failed to generate clue:', error)
+      // Fallback to original clue system
+      const clue = this.state.targetCity.clues[this.state.currentClueIndex]
+      this.state.usedClues.push(clue)
+      this.state.clueMode = 'offline'
+      this.state.currentClueIndex++
+      return clue
+    }
   }
 
   revealFullMap(): void {
@@ -188,8 +232,16 @@ export class GameEngine {
     }
   }
 
-  startNewGame(difficulty: keyof typeof SCORING_CONFIG = 'medium'): GameState {
-    this.state = this.initializeGame(difficulty)
+  getClueMode(): 'ai' | 'offline' {
+    return this.state.clueMode
+  }
+
+  getGameMode(): GameMode {
+    return this.state.gameMode
+  }
+
+  startNewGame(difficulty: keyof typeof SCORING_CONFIG = 'medium', gameMode: GameMode = 'world'): GameState {
+    this.state = this.initializeGame(difficulty, gameMode)
     this.provideFirstClue() // Provide first clue for new game too
     return this.getGameState()
   }

@@ -1,0 +1,16 @@
+{
+  "mythTemplates": [
+    "Legend says this place was founded when {founder} followed {animal} to {discovery}",
+    "Ancient stories tell of {deity} blessing this land with {blessing}",
+    "According to oral tradition, this city was built where {event} occurred",
+    "Local folklore claims that {ruler} had a vision to build here after dreaming of {vision}",
+    "Mythical tales speak of {creature} protecting this area for centuries"
+  ],
+  "culturalReferences": [
+    "mentioned in the Kebra Nagast",
+    "connected to the Queen of Sheba",
+    "blessed by Ethiopian saints",
+    "visited by ancient traders seeking frankincense",
+    "protected by the Archangel Gabriel"
+  ]
+}

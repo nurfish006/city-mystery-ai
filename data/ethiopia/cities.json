@@ -3,20 +3,54 @@
     {
       "name": "Addis Ababa",
       "region": "Shewa",
-      "historicalSignificance": "Founded in 1886 by Emperor Menelik II",
-      "coordinates": {
-        "lat": 9.0320,
-        "lng": 38.7460
-      }
+      "historicalSignificance": "Founded in 1886 by Emperor Menelik II, meaning 'New Flower' in Amharic",
+      "coordinates": { "lat": 9.0320, "lng": 38.7460 },
+      "culturalFacts": [
+        "Home to the African Union headquarters",
+        "Stands at 2,355 meters above sea level",
+        "Founded after Empress Taytu Betul found hot springs in the area"
+      ],
+      "myths": ["Named by Empress Taytu for the beautiful landscape"],
+      "landmarks": ["Mount Entoto", "Merkato", "Holy Trinity Cathedral"]
     },
     {
       "name": "Lalibela",
       "region": "Amhara", 
-      "historicalSignificance": "Famous for rock-hewn churches from 12th century",
-      "coordinates": {
-        "lat": 12.0317,
-        "lng": 39.0410
-      }
+      "historicalSignificance": "Famous for rock-hewn churches from 12th century, built by King Lalibela",
+      "coordinates": { "lat": 12.0317, "lng": 39.0410 },
+      "culturalFacts": [
+        "Churches carved from solid rock below ground level",
+        "UNESCO World Heritage site since 1978",
+        "Named after King Lalibela who envisioned a 'New Jerusalem'"
+      ],
+      "myths": ["Angels helped masons build the churches overnight"],
+      "landmarks": ["Bete Giyorgis", "Bete Medhane Alem", "Bete Maryam"]
+    },
+    {
+      "name": "Axum",
+      "region": "Tigray",
+      "historicalSignificance": "Ancient capital of the Aksumite Empire, home of the Ark of the Covenant",
+      "coordinates": { "lat": 14.1213, "lng": 38.7233 },
+      "culturalFacts": [
+        "Home to ancient obelisks and stelae",
+        "Believed to house the Ark of the Covenant",
+        "One of the oldest continuously inhabited cities in Africa"
+      ],
+      "myths": ["Founded by son of King Solomon and Queen of Sheba"],
+      "landmarks": ["Obelisk of Axum", "Church of Our Lady Mary of Zion", "King Ezana's Inscription"]
+    },
+    {
+      "name": "Gondar",
+      "region": "Amhara",
+      "historicalSignificance": "Former imperial capital known for its medieval castles and palaces",
+      "coordinates": { "lat": 12.6070, "lng": 37.4662 },
+      "culturalFacts": [
+        "Known as the 'Camelot of Africa'",
+        "Fasil Ghebbi fortress complex is UNESCO site",
+        "Home to the Debre Berhan Selassie Church with famous ceiling angels"
+      ],
+      "myths": ["Founded after Emperor Fasilides followed a buffalo to a holy spring"],
+      "landmarks": ["Fasil Ghebbi", "Royal Enclosure", "Bath of Fasilides"]
     }
   ]
 }

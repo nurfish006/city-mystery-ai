@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { GameEngine, GameState } from '@/lib/game/gameEngine'
 import { ValidationResult } from '@/lib/utils/validateGuess'
+import { clueManager } from '@/lib/ai/clueManager'
 
 const SCORING_CONFIG = {
   easy: { basePoints: 1000, cluePenalty: 50, attemptPenalty: 20 },
@@ -20,10 +21,14 @@ interface GameStoreState {
     timestamp: Date
   }>
   
-  initializeGame: (difficulty?: keyof typeof SCORING_CONFIG) => void
-  getNextClue: () => string | null
+  // AI/Offline status
+  clueMode: 'ai' | 'offline'
+  isAIAvailable: boolean
+
+  initializeGame: (difficulty?: keyof typeof SCORING_CONFIG, gameMode?: 'world' | 'ethiopia') => Promise<void>
+  getNextClue: () => Promise<string | null>
   submitGuess: (guess: string) => ValidationResult
-  startNewGame: (difficulty?: keyof typeof SCORING_CONFIG) => void
+  startNewGame: (difficulty?: keyof typeof SCORING_CONFIG, gameMode?: 'world' | 'ethiopia') => void
   getRemainingClues: () => number
   getMapState: () => {
     center: { lat: number; lng: number }
@@ -32,6 +37,8 @@ interface GameStoreState {
     actualCityCoordinates: { lat: number; lng: number }
   } | null
   revealFullMap: () => void
+  checkAIAvailability: () => Promise<boolean>
+  switchToOffline: () => void
 }
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
@@ -39,47 +46,59 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   gameState: null,
   currentClue: null,
   gameHistory: [],
+  clueMode: 'offline',
+  isAIAvailable: false,
 
-  initializeGame: (difficulty = 'medium') => {
-    console.log('🔄 Initializing game with first clue...')
-    const gameEngine = new GameEngine(difficulty)
-    const gameState = gameEngine.getGameState()
+  initializeGame: async (difficulty = 'medium', gameMode = 'world') => {
+    console.log('🔄 Initializing game with AI/Offline system...')
     
-    // First clue is automatically shown - no penalty
-    const currentClue = gameState.currentClueIndex > 0 ? gameState.targetCity.clues[0] : null
+    // Initialize clue manager first
+    await clueManager.initialize()
+    const initialMode = clueManager.getCurrentMode()
+    
+    const gameEngine = new GameEngine(difficulty, gameMode)
+    const gameState = gameEngine.getGameState()
+    const clueMode = gameEngine.getClueMode()
+    
+    // Get the first clue that was automatically provided
+    const currentClue = gameState.usedClues.length > 0 ? gameState.usedClues[0] : null
     
     console.log('✅ Game initialized:', {
+      mode: clueMode,
+      gameMode,
       city: gameState.targetCity.name,
-      clueIndex: gameState.currentClueIndex,
-      totalClues: gameState.targetCity.clues.length,
-      firstClue: currentClue?.substring(0, 50) + '...'
+      hasFirstClue: !!currentClue
     })
     
-    set({ gameEngine, gameState, currentClue })
+    set({ 
+      gameEngine, 
+      gameState, 
+      currentClue, 
+      clueMode,
+      isAIAvailable: initialMode === 'ai'
+    })
   },
 
-  getNextClue: () => {
-    const { gameEngine, gameState } = get()
-    if (!gameEngine || !gameState) {
+  getNextClue: async () => {
+    const { gameEngine } = get()
+    if (!gameEngine) {
       console.error('❌ Game not initialized')
       return null
     }
 
-    console.log('🔄 Store: Getting next clue...', {
-      currentIndex: gameState.currentClueIndex,
-      totalClues: gameState.targetCity.clues.length
-    })
+    console.log('🔄 Store: Getting next clue...')
 
-    const clue = gameEngine.getCurrentClue()
+    const clue = await gameEngine.getCurrentClue()
     const newGameState = gameEngine.getGameState()
+    const clueMode = gameEngine.getClueMode()
     
     console.log('✅ Store: Clue retrieved', {
       newIndex: newGameState.currentClueIndex,
-      newBlur: newGameState.mapReveal.blurIntensity,
-      newReveal: newGameState.mapReveal.revealPercentage
+      mode: clueMode,
+      clueLength: clue?.length
     })
     
-    set({ currentClue: clue, gameState: newGameState })
+    set({ currentClue: clue, gameState: newGameState, clueMode })
     return clue
   },
 
@@ -130,18 +149,20 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     return result
   },
 
-  startNewGame: (difficulty = 'medium') => {
+  startNewGame: (difficulty = 'medium', gameMode = 'world') => {
     const { gameEngine } = get()
     if (!gameEngine) {
-      get().initializeGame(difficulty)
+      get().initializeGame(difficulty, gameMode)
       return
     }
 
-    const gameState = gameEngine.startNewGame(difficulty)
-    // First clue is automatically available
-    const currentClue = gameState.currentClueIndex > 0 ? gameState.targetCity.clues[0] : null
+    const gameState = gameEngine.startNewGame(difficulty, gameMode)
+    const clueMode = gameEngine.getClueMode()
     
-    set({ gameState, currentClue })
+    // First clue is automatically available
+    const currentClue = gameState.usedClues.length > 0 ? gameState.usedClues[0] : null
+    
+    set({ gameState, currentClue, clueMode })
   },
 
   getRemainingClues: () => {
@@ -152,5 +173,16 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   getMapState: () => {
     const { gameEngine } = get()
     return gameEngine ? gameEngine.getMapState() : null
+  },
+
+  checkAIAvailability: async (): Promise<boolean> => {
+    const available = await clueManager.retryAIConnection()
+    set({ isAIAvailable: available, clueMode: available ? 'ai' : 'offline' })
+    return available
+  },
+
+  switchToOffline: () => {
+    clueManager.switchToOffline()
+    set({ clueMode: 'offline', isAIAvailable: false })
   }
 }))
