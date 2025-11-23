@@ -61,18 +61,25 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   },
 
   getNextClue: () => {
-    const { gameEngine } = get()
-    if (!gameEngine) {
-      console.error('Game not initialized')
-      return null
-    }
+  const { gameEngine } = get()
+  if (!gameEngine) {
+    console.error('Game not initialized')
+    return null
+  }
 
-    const clue = gameEngine.getCurrentClue()
-    const gameState = gameEngine.getGameState()
-    
-    set({ currentClue: clue, gameState })
-    return clue
-  },
+  const clue = gameEngine.getCurrentClue()
+  const gameState = gameEngine.getGameState()
+  
+  // DEBUG: Log the map reveal state to see if it's updating
+  console.log('After getting clue:', {
+    clueIndex: gameState.currentClueIndex,
+    blurIntensity: gameState.mapReveal.blurIntensity,
+    revealPercentage: gameState.mapReveal.revealPercentage
+  })
+  
+  set({ currentClue: clue, gameState })
+  return clue
+},
 
   submitGuess: (guess: string) => {
     const { gameEngine } = get()
