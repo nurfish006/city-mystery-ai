@@ -58,7 +58,7 @@ export function MapPreview() {
         <h3 className="text-lg font-semibold text-gray-800">Geographical Clue</h3>
         <div className="flex gap-2">
           <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
-            Clue {gameState.currentClueIndex + 1}/{gameState.targetCity.clues.length + 1}
+            Clue {gameState.currentClueIndex }/{gameState.targetCity.clues.length }
           </span>
           <span className="bg-purple-100 text-purple-800 text-sm px-2 py-1 rounded">
             Blur: {gameState.mapReveal.blurIntensity}/10

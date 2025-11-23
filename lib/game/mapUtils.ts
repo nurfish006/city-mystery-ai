@@ -7,23 +7,24 @@ export interface MapRevealState {
 }
 
 export function calculateMapReveal(clueIndex: number, totalClues: number): MapRevealState {
-  // Ensure we don't go out of bounds
+  // For 4 clues, we have 5 states (including full reveal)
   const safeIndex = Math.min(clueIndex, MAP_CONFIG.blurLevels.length - 1)
   const blurIntensity = MAP_CONFIG.blurLevels[safeIndex]
   const revealPercentage = MAP_CONFIG.revealPercentages[safeIndex]
   
-  console.log('🔄 calculateMapReveal called:', {
+  console.log('🔄 calculateMapReveal:', {
     clueIndex,
     totalClues,
     safeIndex,
     blurIntensity,
-    revealPercentage
+    revealPercentage,
+    state: clueIndex <= totalClues ? `After ${clueIndex} clue(s)` : 'Full reveal'
   })
   
   return {
     blurIntensity,
     revealPercentage,
-    isFullyRevealed: clueIndex >= totalClues
+    isFullyRevealed: false // This will be set to true only by revealFullMap
   }
 }
 

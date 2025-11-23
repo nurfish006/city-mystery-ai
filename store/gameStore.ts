@@ -31,6 +31,7 @@ interface GameStoreState {
     reveal: { blurIntensity: number; revealPercentage: number; isFullyRevealed: boolean }
     actualCityCoordinates: { lat: number; lng: number }
   } | null
+  revealFullMap: () => void
 }
 
 export const useGameStore = create<GameStoreState>((set, get) => ({
@@ -74,11 +75,30 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     
     console.log('✅ Store: Clue retrieved', {
       newIndex: newGameState.currentClueIndex,
-      newBlur: newGameState.mapReveal.blurIntensity
+      newBlur: newGameState.mapReveal.blurIntensity,
+      newReveal: newGameState.mapReveal.revealPercentage
     })
     
     set({ currentClue: clue, gameState: newGameState })
     return clue
+  },
+
+  revealFullMap: () => {
+    const { gameEngine, gameState } = get()
+    if (!gameEngine || !gameState) {
+      console.error('❌ Game not initialized')
+      return
+    }
+
+    // Only allow if all clues are used
+    if (gameState.currentClueIndex >= gameState.targetCity.clues.length) {
+      gameEngine.revealFullMap()
+      const newGameState = gameEngine.getGameState()
+      set({ gameState: newGameState })
+      console.log('✅ Full map revealed in store')
+    } else {
+      console.log('❌ Cannot reveal full map - not all clues used')
+    }
   },
 
   submitGuess: (guess: string) => {

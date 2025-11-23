@@ -10,14 +10,14 @@ export const MAP_CONFIG: MapConfig = {
   initialZoom: 3,
   maxZoom: 10,
   minZoom: 2,
-  // Index mapping:
-  // 0 = Start (before first clue) - Not used anymore
+  // Index mapping for 4 clues:
   // 1 = After 1st clue (free) - Heavy blur
   // 2 = After 2nd clue - Medium blur  
   // 3 = After 3rd clue - Light blur
-  // 4 = After 4th clue - Clear
-  blurLevels: [10, 5, 2, 0],
-  revealPercentages: [25, 50, 75, 100]
+  // 4 = After 4th clue - Almost clear (but not fully)
+  // 5 = After "Reveal Full Map" click - Completely clear
+  blurLevels: [8, 5, 2, 1, 0],
+  revealPercentages: [25, 50, 75, 90, 100]
 }
 
 export const MAP_STYLES = {

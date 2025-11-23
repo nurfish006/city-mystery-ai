@@ -28,8 +28,6 @@ export class GameEngine {
 
   constructor(difficulty: keyof typeof SCORING_CONFIG = 'medium') {
     this.state = this.initializeGame(difficulty)
-    
-    // Automatically provide first clue (free)
     this.provideFirstClue()
   }
 
@@ -111,10 +109,25 @@ export class GameEngine {
     console.log('✅ Clue retrieved:', {
       newIndex: this.state.currentClueIndex,
       effectiveCluesUsed,
-      blurIntensity: this.state.mapReveal.blurIntensity
+      blurIntensity: this.state.mapReveal.blurIntensity,
+      revealPercentage: this.state.mapReveal.revealPercentage
     })
     
     return clue
+  }
+
+  revealFullMap(): void {
+    if (this.state.currentClueIndex >= this.state.targetCity.clues.length) {
+      // Only allow full reveal after all clues are used
+      this.state.mapReveal = {
+        blurIntensity: 0,
+        revealPercentage: 100,
+        isFullyRevealed: true
+      }
+      console.log('🗺️ Full map revealed!')
+    } else {
+      console.log('❌ Cannot reveal full map - not all clues used yet')
+    }
   }
 
   submitGuess(guess: string): ValidationResult {
