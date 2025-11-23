@@ -21,11 +21,10 @@ interface GameStoreState {
     timestamp: Date
   }>
   
-  // AI/Offline status
   clueMode: 'ai' | 'offline'
   isAIAvailable: boolean
 
-  initializeGame: (difficulty?: keyof typeof SCORING_CONFIG, gameMode?: 'world' | 'ethiopia') => Promise<void>
+  initializeGame: (difficulty?: keyof typeof SCORING_CONFIG, gameMode?: 'world' | 'ethiopia') => void
   getNextClue: () => Promise<string | null>
   submitGuess: (guess: string) => ValidationResult
   startNewGame: (difficulty?: keyof typeof SCORING_CONFIG, gameMode?: 'world' | 'ethiopia') => void
@@ -49,21 +48,22 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   clueMode: 'offline',
   isAIAvailable: false,
 
-  initializeGame: async (difficulty = 'medium', gameMode = 'world') => {
-    console.log('🔄 Initializing game with AI/Offline system...')
+  initializeGame: (difficulty = 'medium', gameMode = 'world') => {
+    console.log('🔄 Initializing game...')
     
-    // Initialize clue manager first
-    await clueManager.initialize()
-    const initialMode = clueManager.getCurrentMode()
+    // Initialize clue manager but don't wait for it
+    clueManager.initialize().catch(() => {
+      console.log('🔧 Clue manager initialized in offline mode')
+    })
     
     const gameEngine = new GameEngine(difficulty, gameMode)
     const gameState = gameEngine.getGameState()
     const clueMode = gameEngine.getClueMode()
     
-    // Get the first clue that was automatically provided
-    const currentClue = gameState.usedClues.length > 0 ? gameState.usedClues[0] : null
+    // First clue should be available immediately
+    const currentClue = gameState.usedClues.length > 0 ? gameState.usedClues[0] : 'Welcome! Start guessing or get more clues.'
     
-    console.log('✅ Game initialized:', {
+    console.log('✅ Game ready:', {
       mode: clueMode,
       gameMode,
       city: gameState.targetCity.name,
@@ -75,7 +75,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       gameState, 
       currentClue, 
       clueMode,
-      isAIAvailable: initialMode === 'ai'
+      isAIAvailable: clueMode === 'ai'
     })
   },
 
@@ -86,17 +86,9 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
       return null
     }
 
-    console.log('🔄 Store: Getting next clue...')
-
     const clue = await gameEngine.getCurrentClue()
     const newGameState = gameEngine.getGameState()
     const clueMode = gameEngine.getClueMode()
-    
-    console.log('✅ Store: Clue retrieved', {
-      newIndex: newGameState.currentClueIndex,
-      mode: clueMode,
-      clueLength: clue?.length
-    })
     
     set({ currentClue: clue, gameState: newGameState, clueMode })
     return clue
@@ -104,19 +96,12 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
   revealFullMap: () => {
     const { gameEngine, gameState } = get()
-    if (!gameEngine || !gameState) {
-      console.error('❌ Game not initialized')
-      return
-    }
+    if (!gameEngine || !gameState) return
 
-    // Only allow if all clues are used
     if (gameState.currentClueIndex >= gameState.targetCity.clues.length) {
       gameEngine.revealFullMap()
       const newGameState = gameEngine.getGameState()
       set({ gameState: newGameState })
-      console.log('✅ Full map revealed in store')
-    } else {
-      console.log('❌ Cannot reveal full map - not all clues used')
     }
   },
 
@@ -158,9 +143,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
 
     const gameState = gameEngine.startNewGame(difficulty, gameMode)
     const clueMode = gameEngine.getClueMode()
-    
-    // First clue is automatically available
-    const currentClue = gameState.usedClues.length > 0 ? gameState.usedClues[0] : null
+    const currentClue = gameState.usedClues.length > 0 ? gameState.usedClues[0] : 'Welcome! Start guessing.'
     
     set({ gameState, currentClue, clueMode })
   },
