@@ -28,13 +28,16 @@ export class GameEngine {
 
   constructor(difficulty: keyof typeof SCORING_CONFIG = 'medium') {
     this.state = this.initializeGame(difficulty)
+    
+    // Automatically provide first clue (free)
+    this.provideFirstClue()
   }
 
   private initializeGame(difficulty: keyof typeof SCORING_CONFIG): GameState {
     const targetCity = getRandomCity()
     const mapOffset = generateMapOffset()
     
-    // Calculate initial map reveal state - START WITH CLUE INDEX 0
+    // Start with clue index 0 (first clue will be automatically provided)
     const mapReveal = calculateMapReveal(0, targetCity.clues.length)
     
     console.log('🎮 Game initialized:', {
@@ -45,7 +48,7 @@ export class GameEngine {
     
     return {
       targetCity,
-      currentClueIndex: 0, // Start at 0, not 1
+      currentClueIndex: 0, // Will be incremented to 1 after first clue
       usedClues: [],
       attempts: 0,
       score: 0,
@@ -62,40 +65,57 @@ export class GameEngine {
     }
   }
 
-getCurrentClue(): string | null {
-  if (this.state.currentClueIndex >= this.state.targetCity.clues.length) {
-    console.log('❌ No more clues available - current index:', this.state.currentClueIndex, 'total clues:', this.state.targetCity.clues.length)
-    return null
+  private provideFirstClue(): void {
+    // First clue is free - no penalty, automatically provided
+    if (this.state.targetCity.clues.length > 0) {
+      const firstClue = this.state.targetCity.clues[0]
+      this.state.usedClues.push(firstClue)
+      this.state.currentClueIndex = 1 // Now we're at first clue
+      
+      // Update map for first clue state
+      this.state.mapReveal = calculateMapReveal(1, this.state.targetCity.clues.length)
+      
+      console.log('🎁 First clue provided automatically:', {
+        clue: firstClue.substring(0, 50) + '...',
+        newIndex: this.state.currentClueIndex,
+        blur: this.state.mapReveal.blurIntensity
+      })
+    }
   }
-  
-  const clue = this.state.targetCity.clues[this.state.currentClueIndex]
-  this.state.usedClues.push(clue)
-  
-  console.log('🔍 Getting clue at index:', this.state.currentClueIndex, 'clue:', clue.substring(0, 50) + '...')
-  
-  // FIRST increment the index so we're ready for next clue
-  this.state.currentClueIndex++
-  
-  // NOW update map reveal with the NEW index (after incrementing)
-  // This ensures the blur matches the clue the user just received
-  this.state.mapReveal = calculateMapReveal(
-    this.state.currentClueIndex, 
-    this.state.targetCity.clues.length
-  )
-  
-  // Update max possible score
-  this.state.maxPossibleScore = SCORING_CONFIG[this.state.difficulty].basePoints - 
-    (this.state.currentClueIndex * SCORING_CONFIG[this.state.difficulty].cluePenalty)
-  
-  console.log('✅ Clue retrieved:', {
-    newIndex: this.state.currentClueIndex,
-    blurIntensity: this.state.mapReveal.blurIntensity,
-    revealPercentage: this.state.mapReveal.revealPercentage,
-    clueLength: clue.length
-  })
-  
-  return clue
-}
+
+  getCurrentClue(): string | null {
+    if (this.state.currentClueIndex >= this.state.targetCity.clues.length) {
+      console.log('❌ No more clues available')
+      return null
+    }
+    
+    const clue = this.state.targetCity.clues[this.state.currentClueIndex]
+    this.state.usedClues.push(clue)
+    
+    console.log('🔍 Getting clue at index:', this.state.currentClueIndex)
+    
+    // Update map reveal with CURRENT index (before incrementing)
+    this.state.mapReveal = calculateMapReveal(
+      this.state.currentClueIndex, 
+      this.state.targetCity.clues.length
+    )
+    
+    // Increment index for next call
+    this.state.currentClueIndex++
+    
+    // Update max possible score (first clue was free, so subtract 1)
+    const effectiveCluesUsed = Math.max(0, this.state.currentClueIndex - 1)
+    this.state.maxPossibleScore = SCORING_CONFIG[this.state.difficulty].basePoints - 
+      (effectiveCluesUsed * SCORING_CONFIG[this.state.difficulty].cluePenalty)
+    
+    console.log('✅ Clue retrieved:', {
+      newIndex: this.state.currentClueIndex,
+      effectiveCluesUsed,
+      blurIntensity: this.state.mapReveal.blurIntensity
+    })
+    
+    return clue
+  }
 
   submitGuess(guess: string): ValidationResult {
     if (this.state.isGameOver) {
@@ -109,10 +129,13 @@ getCurrentClue(): string | null {
       this.state.isGameWon = true
       this.state.isGameOver = true
       
-      const wasPerfect = this.state.attempts === 1 && this.state.currentClueIndex === 1
+      // Calculate final score (first clue is free)
+      const effectiveCluesUsed = Math.max(0, this.state.currentClueIndex - 1)
+      const wasPerfect = this.state.attempts === 1 && effectiveCluesUsed === 0
+      
       this.state.score = calculateScore(
         this.state.difficulty,
-        this.state.currentClueIndex,
+        effectiveCluesUsed,
         this.state.attempts,
         wasPerfect
       )
@@ -124,7 +147,7 @@ getCurrentClue(): string | null {
         isFullyRevealed: true
       }
       
-      console.log('🎉 Game won! Map fully revealed')
+      console.log('🎉 Game won! Score:', this.state.score)
     }
 
     if (this.state.attempts >= 5 && !result.isCorrect) {
@@ -154,6 +177,7 @@ getCurrentClue(): string | null {
 
   startNewGame(difficulty: keyof typeof SCORING_CONFIG = 'medium'): GameState {
     this.state = this.initializeGame(difficulty)
+    this.provideFirstClue() // Provide first clue for new game too
     return this.getGameState()
   }
 }

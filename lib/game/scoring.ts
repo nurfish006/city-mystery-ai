@@ -1,34 +1,12 @@
-export interface ScoreConfig {
-  basePoints: number
-  cluePenalty: number
-  attemptPenalty: number
-  perfectBonus: number
-}
-
 export const SCORING_CONFIG = {
-  easy: {
-    basePoints: 100,
-    cluePenalty: 20,    // Points lost per clue used
-    attemptPenalty: 10, // Points lost per wrong guess
-    perfectBonus: 50    // Bonus for guessing with first clue
-  },
-  medium: {
-    basePoints: 150, 
-    cluePenalty: 30,
-    attemptPenalty: 15,
-    perfectBonus: 75
-  },
-  hard: {
-    basePoints: 200,
-    cluePenalty: 40,
-    attemptPenalty: 20, 
-    perfectBonus: 100
-  }
+  easy: { basePoints: 1000, cluePenalty: 50, attemptPenalty: 20 },
+  medium: { basePoints: 1500, cluePenalty: 75, attemptPenalty: 30 },
+  hard: { basePoints: 2000, cluePenalty: 100, attemptPenalty: 40 }
 } as const
 
 export function calculateScore(
   difficulty: keyof typeof SCORING_CONFIG,
-  cluesUsed: number,
+  cluesUsed: number, // This should already account for first clue being free
   attempts: number,
   wasPerfect: boolean
 ): number {
@@ -36,17 +14,24 @@ export function calculateScore(
   
   let score = config.basePoints
   score -= cluesUsed * config.cluePenalty
-  score -= (attempts - 1) * config.attemptPenalty // First attempt doesn't count as penalty
+  score -= (attempts - 1) * config.attemptPenalty
   
+  // Ensure score doesn't go below 0
+  score = Math.max(0, score)
+  
+  // Bonus for perfect game (first attempt, no additional clues beyond free one)
   if (wasPerfect) {
-    score += config.perfectBonus
+    score += 500
   }
   
-  // Ensure score doesn't go below minimum
-  return Math.max(score, 10)
-}
-
-export function getMaxPossibleScore(difficulty: keyof typeof SCORING_CONFIG, cluesUsed: number): number {
-  const config = SCORING_CONFIG[difficulty]
-  return config.basePoints - (cluesUsed * config.cluePenalty) + config.perfectBonus
+  console.log('💰 Score calculation:', {
+    difficulty,
+    cluesUsed,
+    attempts,
+    base: config.basePoints,
+    finalScore: score,
+    perfectBonus: wasPerfect ? 500 : 0
+  })
+  
+  return score
 }

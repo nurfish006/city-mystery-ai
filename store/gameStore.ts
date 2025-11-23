@@ -40,11 +40,21 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   gameHistory: [],
 
   initializeGame: (difficulty = 'medium') => {
-    console.log('🔄 Initializing game...')
+    console.log('🔄 Initializing game with first clue...')
     const gameEngine = new GameEngine(difficulty)
     const gameState = gameEngine.getGameState()
-    // DO NOT get first clue automatically - let user click for first clue
-    set({ gameEngine, gameState, currentClue: null })
+    
+    // First clue is automatically shown - no penalty
+    const currentClue = gameState.currentClueIndex > 0 ? gameState.targetCity.clues[0] : null
+    
+    console.log('✅ Game initialized:', {
+      city: gameState.targetCity.name,
+      clueIndex: gameState.currentClueIndex,
+      totalClues: gameState.targetCity.clues.length,
+      firstClue: currentClue?.substring(0, 50) + '...'
+    })
+    
+    set({ gameEngine, gameState, currentClue })
   },
 
   getNextClue: () => {
@@ -64,8 +74,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     
     console.log('✅ Store: Clue retrieved', {
       newIndex: newGameState.currentClueIndex,
-      newBlur: newGameState.mapReveal.blurIntensity,
-      newReveal: newGameState.mapReveal.revealPercentage
+      newBlur: newGameState.mapReveal.blurIntensity
     })
     
     set({ currentClue: clue, gameState: newGameState })
@@ -109,7 +118,8 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     }
 
     const gameState = gameEngine.startNewGame(difficulty)
-    const currentClue = null // Reset current clue
+    // First clue is automatically available
+    const currentClue = gameState.currentClueIndex > 0 ? gameState.targetCity.clues[0] : null
     
     set({ gameState, currentClue })
   },

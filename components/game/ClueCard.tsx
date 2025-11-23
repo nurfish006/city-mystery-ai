@@ -2,6 +2,13 @@
 
 import { useGameStore } from '@/store/gameStore'
 
+// Add SCORING_CONFIG directly in the component file
+const SCORING_CONFIG = {
+  easy: { basePoints: 1000, cluePenalty: 50, attemptPenalty: 20 },
+  medium: { basePoints: 1500, cluePenalty: 75, attemptPenalty: 30 },
+  hard: { basePoints: 2000, cluePenalty: 100, attemptPenalty: 40 }
+} as const
+
 export function ClueCard() {
   const { gameState, currentClue, getNextClue } = useGameStore()
 
@@ -13,16 +20,10 @@ export function ClueCard() {
     )
   }
 
-  console.log('🔍 ClueCard rendering:', {
-    currentClueIndex: gameState.currentClueIndex,
-    totalClues: gameState.targetCity.clues.length,
-    currentClue: currentClue,
-    canGetClue: gameState.currentClueIndex < gameState.targetCity.clues.length
-  })
-
   const canGetClue = gameState.currentClueIndex < gameState.targetCity.clues.length
   const allCluesRevealed = !canGetClue
   const isGameActive = !gameState.isGameOver
+  const isFirstClue = gameState.currentClueIndex === 1 && currentClue
 
   return (
     <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -32,28 +33,44 @@ export function ClueCard() {
           <span className="bg-gray-100 text-gray-800 text-sm px-2 py-1 rounded">
             {gameState.currentClueIndex}/{gameState.targetCity.clues.length} Clues
           </span>
+          {isFirstClue && (
+            <span className="bg-green-100 text-green-800 text-sm px-2 py-1 rounded">
+              Free!
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Display current clue or empty state */}
+      {/* First clue is always visible from start */}
       {currentClue ? (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
           <div className="flex items-start gap-3">
             <div className="bg-yellow-100 text-yellow-800 rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
               {gameState.currentClueIndex}
             </div>
-            <p className="text-gray-800 text-lg">{currentClue}</p>
+            <div className="flex-1">
+              <p className="text-gray-800 text-lg mb-2">{currentClue}</p>
+              {isFirstClue && (
+                <p className="text-green-600 text-sm flex items-center gap-1">
+                  <span>🎁</span>
+                  <span>First clue - no points deducted!</span>
+                </p>
+              )}
+              {gameState.currentClueIndex > 1 && (
+                <p className="text-orange-600 text-sm">
+                  Clue #{gameState.currentClueIndex} - {SCORING_CONFIG[gameState.difficulty].cluePenalty} point penalty
+                </p>
+              )}
+            </div>
           </div>
         </div>
       ) : (
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center mb-4">
-          <div className="text-4xl mb-2">🔍</div>
-          <p className="text-gray-500 mb-2">No clues revealed yet</p>
-          <p className="text-gray-400 text-sm">Click the button below to get your first clue</p>
+          <p className="text-gray-500">Loading first clue...</p>
         </div>
       )}
 
-      {/* Get Clue Button */}
+      {/* Get Next Clue Button */}
       <button
         onClick={getNextClue}
         disabled={!canGetClue || !isGameActive}
@@ -61,28 +78,27 @@ export function ClueCard() {
       >
         {!isGameActive ? 'Game Finished' :
          allCluesRevealed ? 'All Clues Revealed' : 
-         currentClue ? 'Get Next Clue' : 'Get First Clue'
+         'Get Next Clue →'
         }
-        {canGetClue && isGameActive && '→'}
       </button>
 
-      {/* Progress indicator */}
-      <div className="mt-4">
-        <div className="flex justify-between text-sm text-gray-600 mb-1">
-          <span>Clue Progress</span>
-          <span>{gameState.currentClueIndex} of {gameState.targetCity.clues.length}</span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className="bg-green-500 h-2 rounded-full transition-all duration-300"
-            style={{ 
-              width: `${(gameState.currentClueIndex / gameState.targetCity.clues.length) * 100}%` 
-            }}
-          />
-        </div>
+      {/* Clue cost information */}
+      <div className="mt-3 text-sm text-gray-600 space-y-1">
+        {isFirstClue && (
+          <p className="text-green-600 flex items-center gap-1">
+            <span>✓</span>
+            <span>First clue is free - no point penalty</span>
+          </p>
+        )}
+        {canGetClue && gameState.currentClueIndex >= 1 && (
+          <p className="text-orange-600">
+            Next clue will cost {SCORING_CONFIG[gameState.difficulty].cluePenalty} points
+          </p>
+        )}
+        <p className="text-gray-500">
+          Remaining clues: {gameState.targetCity.clues.length - gameState.currentClueIndex}
+        </p>
       </div>
-
-      {/* Debug info - you can remove this after it works */}
     </div>
   )
 }
