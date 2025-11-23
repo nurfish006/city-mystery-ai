@@ -10,8 +10,9 @@ export const MAP_CONFIG: MapConfig = {
   initialZoom: 3,
   maxZoom: 10,
   minZoom: 2,
-  blurLevels: [8, 6, 3, 0],
-  revealPercentages: [25, 50, 75, 100]
+  // For 4 clues total: [start, clue1, clue2, clue3, clue4]
+  blurLevels: [10, 8, 5, 2, 0],
+  revealPercentages: [0, 25, 50, 75, 100]
 }
 
 export const MAP_STYLES = {

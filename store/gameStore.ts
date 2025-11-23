@@ -2,25 +2,15 @@ import { create } from 'zustand'
 import { GameEngine, GameState } from '@/lib/game/gameEngine'
 import { ValidationResult } from '@/lib/utils/validateGuess'
 
-// Add this if missing - scoring config interface
-interface ScoringConfig {
-  maxScore: number
-  cluePenalty: number
-  attemptPenalty: number
-}
-
 const SCORING_CONFIG = {
-  easy: { maxScore: 1000, cluePenalty: 50, attemptPenalty: 20 },
-  medium: { maxScore: 1500, cluePenalty: 75, attemptPenalty: 30 },
-  hard: { maxScore: 2000, cluePenalty: 100, attemptPenalty: 40 }
+  easy: { basePoints: 1000, cluePenalty: 50, attemptPenalty: 20 },
+  medium: { basePoints: 1500, cluePenalty: 75, attemptPenalty: 30 },
+  hard: { basePoints: 2000, cluePenalty: 100, attemptPenalty: 40 }
 } as const
 
 interface GameStoreState {
-  // Game Engine
   gameEngine: GameEngine | null
   gameState: GameState | null
-  
-  // UI State
   currentClue: string | null
   gameHistory: Array<{
     city: string
@@ -30,14 +20,11 @@ interface GameStoreState {
     timestamp: Date
   }>
   
-  // Actions
   initializeGame: (difficulty?: keyof typeof SCORING_CONFIG) => void
   getNextClue: () => string | null
   submitGuess: (guess: string) => ValidationResult
   startNewGame: (difficulty?: keyof typeof SCORING_CONFIG) => void
   getRemainingClues: () => number
-  
-  // Map action 
   getMapState: () => {
     center: { lat: number; lng: number }
     offset: { latOffset: number; lngOffset: number }
@@ -53,33 +40,37 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
   gameHistory: [],
 
   initializeGame: (difficulty = 'medium') => {
+    console.log('🔄 Initializing game...')
     const gameEngine = new GameEngine(difficulty)
     const gameState = gameEngine.getGameState()
-    const currentClue = gameEngine.getCurrentClue() // Get first clue automatically
-    
-    set({ gameEngine, gameState, currentClue })
+    // DO NOT get first clue automatically - let user click for first clue
+    set({ gameEngine, gameState, currentClue: null })
   },
 
   getNextClue: () => {
-  const { gameEngine } = get()
-  if (!gameEngine) {
-    console.error('Game not initialized')
-    return null
-  }
+    const { gameEngine, gameState } = get()
+    if (!gameEngine || !gameState) {
+      console.error('❌ Game not initialized')
+      return null
+    }
 
-  const clue = gameEngine.getCurrentClue()
-  const gameState = gameEngine.getGameState()
-  
-  // DEBUG: Log the map reveal state to see if it's updating
-  console.log('After getting clue:', {
-    clueIndex: gameState.currentClueIndex,
-    blurIntensity: gameState.mapReveal.blurIntensity,
-    revealPercentage: gameState.mapReveal.revealPercentage
-  })
-  
-  set({ currentClue: clue, gameState })
-  return clue
-},
+    console.log('🔄 Store: Getting next clue...', {
+      currentIndex: gameState.currentClueIndex,
+      totalClues: gameState.targetCity.clues.length
+    })
+
+    const clue = gameEngine.getCurrentClue()
+    const newGameState = gameEngine.getGameState()
+    
+    console.log('✅ Store: Clue retrieved', {
+      newIndex: newGameState.currentClueIndex,
+      newBlur: newGameState.mapReveal.blurIntensity,
+      newReveal: newGameState.mapReveal.revealPercentage
+    })
+    
+    set({ currentClue: clue, gameState: newGameState })
+    return clue
+  },
 
   submitGuess: (guess: string) => {
     const { gameEngine } = get()
@@ -90,7 +81,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     const result = gameEngine.submitGuess(guess)
     const gameState = gameEngine.getGameState()
 
-    // Add to history if game is won
     if (result.isCorrect && gameState.isGameWon) {
       const { gameHistory } = get()
       set({
@@ -119,7 +109,7 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     }
 
     const gameState = gameEngine.startNewGame(difficulty)
-    const currentClue = gameEngine.getCurrentClue()
+    const currentClue = null // Reset current clue
     
     set({ gameState, currentClue })
   },
@@ -129,7 +119,6 @@ export const useGameStore = create<GameStoreState>((set, get) => ({
     return gameEngine ? gameEngine.getRemainingClues() : 0
   },
 
-  // Get map state - fixed syntax
   getMapState: () => {
     const { gameEngine } = get()
     return gameEngine ? gameEngine.getMapState() : null
