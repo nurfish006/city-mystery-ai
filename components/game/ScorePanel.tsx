@@ -1,64 +1,51 @@
-'use client'
+"use client"
 
-import { useGameStore } from '@/store/gameStore'
+import { Heart, Trophy } from "lucide-react"
+import { Progress } from "@/components/ui/progress"
 
-export function ScorePanel() {
-  const { gameState } = useGameStore()
+interface ScorePanelProps {
+  score: number
+  lives: number
+  maxLives?: number
+  cluesUsed: number
+  totalClues?: number
+}
 
-  if (!gameState) {
-    return (
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Score</h3>
-        <p className="text-gray-500">Start a game to see your score</p>
-      </div>
-    )
-  }
-
+export function ScorePanel({ score, lives, maxLives = 3, cluesUsed, totalClues = 4 }: ScorePanelProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-6">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Game Progress</h3>
-      
-      <div className="space-y-3">
-        <div className="flex justify-between">
-          <span className="text-gray-600">Difficulty:</span>
-          <span className="font-medium capitalize">{gameState.difficulty}</span>
+    <div className="bg-card border rounded-lg p-4 flex items-center justify-between shadow-sm">
+      <div className="flex flex-col gap-1">
+        <div className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Current Score</div>
+        <div className="flex items-center gap-2 text-2xl font-bold text-primary">
+          <Trophy className="w-5 h-5" />
+          {score}
         </div>
-        
-        <div className="flex justify-between">
-          <span className="text-gray-600">Current Score:</span>
-          <span className="font-medium text-green-600">{gameState.score}</span>
+      </div>
+
+      <div className="h-8 w-px bg-border mx-4 hidden sm:block" />
+
+      <div className="flex flex-col gap-1 items-end sm:items-start">
+        <div className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Lives Left</div>
+        <div className="flex gap-1">
+          {Array.from({ length: maxLives }).map((_, i) => (
+            <Heart
+              key={i}
+              className={`w-5 h-5 ${i < lives ? "fill-red-500 text-red-500" : "text-muted-foreground/30"}`}
+            />
+          ))}
         </div>
-        
-        <div className="flex justify-between">
-          <span className="text-gray-600">Max Possible:</span>
-          <span className="font-medium text-blue-600">{gameState.maxPossibleScore}</span>
+      </div>
+
+      <div className="h-8 w-px bg-border mx-4 hidden sm:block" />
+
+      <div className="hidden sm:flex flex-col gap-1 min-w-[100px]">
+        <div className="text-xs text-muted-foreground uppercase font-bold tracking-wider flex justify-between">
+          <span>Clues</span>
+          <span>
+            {cluesUsed}/{totalClues}
+          </span>
         </div>
-        
-        <div className="flex justify-between">
-          <span className="text-gray-600">Clues Used:</span>
-          <span className="font-medium">{gameState.currentClueIndex}</span>
-        </div>
-        
-        <div className="flex justify-between">
-          <span className="text-gray-600">Attempts:</span>
-          <span className="font-medium">{gameState.attempts}/5</span>
-        </div>
-        
-        <div className="pt-3 border-t border-gray-200">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Status:</span>
-            <span className={`font-medium ${
-              gameState.isGameOver 
-                ? gameState.isGameWon ? 'text-green-600' : 'text-red-600'
-                : 'text-blue-600'
-            }`}>
-              {gameState.isGameOver 
-                ? gameState.isGameWon ? 'Completed' : 'Failed'
-                : 'In Progress'
-              }
-            </span>
-          </div>
-        </div>
+        <Progress value={(cluesUsed / totalClues) * 100} className="h-2" />
       </div>
     </div>
   )

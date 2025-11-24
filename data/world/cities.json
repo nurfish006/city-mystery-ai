@@ -1,43 +1,72 @@
-{
-  "cities": [
-    {
-      "name": "Paris",
-      "country": "France",
-      "continent": "Europe",
-      "coordinates": { "lat": 48.8566, "lng": 2.3522 },
-      "clues": [
-        "I am known as the City of Light, where a famous iron tower kisses the sky.",
-        "My river banks are home to lovers and artists, flowing through the heart of Europe.",
-        "My language is the language of diplomacy, and my fashion sets global trends.",
-        "I host the world's most visited paid monument, standing 324 meters tall."
-      ],
-      "hints": ["france", "eiffel", "seine", "fashion"]
-    },
-    {
-      "name": "Tokyo",
-      "country": "Japan",
-      "continent": "Asia", 
-      "coordinates": { "lat": 35.6762, "lng": 139.6503 },
-      "clues": [
-        "I am a neon-lit metropolis where ancient temples meet cutting-edge technology.",
-        "My crossing is the world's busiest, a synchronized dance of pedestrians.",
-        "I was once called Edo, and my fish market is legendary worldwide.",
-        "My tallest tower stands 634 meters and is painted white and orange."
-      ],
-      "hints": ["japan", "shibuya", "sushi", "skytree"]
-    },
-    {
-      "name": "New York",
-      "country": "USA",
-      "continent": "North America",
-      "coordinates": { "lat": 40.7128, "lng": -74.0060 },
-      "clues": [
-        "I'm the city that never sleeps, with a park larger than some countries.",
-        "My lady stands tall in the harbor, welcoming millions to the land of opportunity.",
-        "My theater district is world-famous, and my pizza is folded, not forked.",
-        "I have five boroughs, but one is an island known for finance and a charging bull."
-      ],
-      "hints": ["usa", "statue of liberty", "central park", "manhattan"]
-    }
-  ]
-}
+[
+  {
+    "id": "1",
+    "name": "Tokyo",
+    "country": "Japan",
+    "coordinates": { "lat": 35.6762, "lng": 139.6503 },
+    "clues": [
+      "I am an island nation's capital, where ancient shrines meet neon skyscrapers.",
+      "My crossing is famous for being the busiest intersection in the world.",
+      "I host the world's tallest tower, which stands at 634 meters.",
+      "My name translates to 'Eastern Capital' in my native language."
+    ],
+    "hints": ["Asia", "Sushi", "Technology"],
+    "region": "Asia"
+  },
+  {
+    "id": "2",
+    "name": "Paris",
+    "country": "France",
+    "coordinates": { "lat": 48.8566, "lng": 2.3522 },
+    "clues": [
+      "I am known as the 'City of Light' and have a famous iron lady watching over me.",
+      "My river, the Seine, divides me into the Left and Right Banks.",
+      "I am home to the world's most visited museum, which houses the Mona Lisa.",
+      "My 12 avenues radiate from the Arc de Triomphe like a star."
+    ],
+    "hints": ["Europe", "Fashion", "Art"],
+    "region": "Europe"
+  },
+  {
+    "id": "3",
+    "name": "Cairo",
+    "country": "Egypt",
+    "coordinates": { "lat": 30.0444, "lng": 31.2357 },
+    "clues": [
+      "I stand near the delta of the longest river in the world.",
+      "Ancient wonders guarding my outskirts are the only surviving wonders of the ancient world.",
+      "I am known as 'The City of a Thousand Minarets'.",
+      "My museum houses the golden mask of a boy king."
+    ],
+    "hints": ["Africa", "Pyramids", "Pharaohs"],
+    "region": "Africa"
+  },
+  {
+    "id": "4",
+    "name": "Rio de Janeiro",
+    "country": "Brazil",
+    "coordinates": { "lat": -22.9068, "lng": -43.1729 },
+    "clues": [
+      "I am famous for my giant Art Deco statue of Jesus overlooking the city.",
+      "My annual carnival is considered the biggest in the world.",
+      "I have iconic beaches named Copacabana and Ipanema.",
+      "Sugarloaf Mountain is one of my most famous natural landmarks."
+    ],
+    "hints": ["South America", "Samba", "Beaches"],
+    "region": "South America"
+  },
+  {
+    "id": "5",
+    "name": "New York City",
+    "country": "USA",
+    "coordinates": { "lat": 40.7128, "lng": -74.006 },
+    "clues": [
+      "I am the 'City That Never Sleeps' and feature a green lady in my harbor.",
+      "My central park is one of the most filmed locations in the world.",
+      "I am made up of five boroughs, with Manhattan being the most famous.",
+      "Wall Street in my financial district is the center of global finance."
+    ],
+    "hints": ["North America", "Skyscrapers", "Broadway"],
+    "region": "North America"
+  }
+]

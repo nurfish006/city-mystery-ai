@@ -1,171 +1,122 @@
-import { create } from 'zustand'
-import { GameEngine, GameState } from '@/lib/game/gameEngine'
-import { ValidationResult } from '@/lib/utils/validateGuess'
-import { clueManager } from '@/lib/ai/clueManager'
+import { create } from "zustand"
 
-const SCORING_CONFIG = {
-  easy: { basePoints: 1000, cluePenalty: 50, attemptPenalty: 20 },
-  medium: { basePoints: 1500, cluePenalty: 75, attemptPenalty: 30 },
-  hard: { basePoints: 2000, cluePenalty: 100, attemptPenalty: 40 }
-} as const
-
-interface GameStoreState {
-  gameEngine: GameEngine | null
-  gameState: GameState | null
-  currentClue: string | null
-  gameHistory: Array<{
-    city: string
-    score: number
-    attempts: number
-    cluesUsed: number
-    timestamp: Date
-  }>
-  
-  clueMode: 'ai' | 'offline'
-  isAIAvailable: boolean
-
-  initializeGame: (difficulty?: keyof typeof SCORING_CONFIG, gameMode?: 'world' | 'ethiopia') => void
-  getNextClue: () => Promise<string | null>
-  submitGuess: (guess: string) => ValidationResult
-  startNewGame: (difficulty?: keyof typeof SCORING_CONFIG, gameMode?: 'world' | 'ethiopia') => void
-  getRemainingClues: () => number
-  getMapState: () => {
-    center: { lat: number; lng: number }
-    offset: { latOffset: number; lngOffset: number }
-    reveal: { blurIntensity: number; revealPercentage: number; isFullyRevealed: boolean }
-    actualCityCoordinates: { lat: number; lng: number }
-  } | null
-  revealFullMap: () => void
-  checkAIAvailability: () => Promise<boolean>
-  switchToOffline: () => void
+export type City = {
+  id: string
+  name: string
+  country?: string
+  region: string
+  coordinates: { lat: number; lng: number }
+  clues: string[]
+  hints: string[]
 }
 
-export const useGameStore = create<GameStoreState>((set, get) => ({
-  gameEngine: null,
-  gameState: null,
-  currentClue: null,
-  gameHistory: [],
-  clueMode: 'offline',
-  isAIAvailable: false,
+type GameState = {
+  // Session
+  isPlaying: boolean
+  gameMode: "world" | "ethiopia"
+  currentCity: City | null
 
-  initializeGame: (difficulty = 'medium', gameMode = 'world') => {
-    console.log('🔄 Initializing game...')
-    
-    // Initialize clue manager but don't wait for it
-    clueManager.initialize().catch(() => {
-      console.log('🔧 Clue manager initialized in offline mode')
-    })
-    
-    const gameEngine = new GameEngine(difficulty, gameMode)
-    const gameState = gameEngine.getGameState()
-    const clueMode = gameEngine.getClueMode()
-    
-    // First clue should be available immediately
-    const currentClue = gameState.usedClues.length > 0 ? gameState.usedClues[0] : 'Welcome! Start guessing or get more clues.'
-    
-    console.log('✅ Game ready:', {
-      mode: clueMode,
-      gameMode,
-      city: gameState.targetCity.name,
-      hasFirstClue: !!currentClue
-    })
-    
-    set({ 
-      gameEngine, 
-      gameState, 
-      currentClue, 
-      clueMode,
-      isAIAvailable: clueMode === 'ai'
+  // Progress
+  score: number
+  lives: number
+  cluesRevealed: number // 0 to 4
+  mapBlurLevel: number // 8, 6, 3, 0
+
+  // History
+  guesses: string[]
+  isGameOver: boolean
+  isWin: boolean
+
+  // Actions
+  startGame: (mode: "world" | "ethiopia", cities: City[]) => void
+  revealClue: () => void
+  makeGuess: (guess: string) => boolean
+  resetGame: () => void
+}
+
+export const useGameStore = create<GameState>((set, get) => ({
+  isPlaying: false,
+  gameMode: "world",
+  currentCity: null,
+
+  score: 100,
+  lives: 3,
+  cluesRevealed: 0,
+  mapBlurLevel: 8,
+
+  guesses: [],
+  isGameOver: false,
+  isWin: false,
+
+  startGame: (mode, cities) => {
+    // Select random city
+    const randomCity = cities[Math.floor(Math.random() * cities.length)]
+
+    set({
+      isPlaying: true,
+      gameMode: mode,
+      currentCity: randomCity,
+      score: 100,
+      lives: 3,
+      cluesRevealed: 1, // Start with 1 clue
+      mapBlurLevel: 8,
+      guesses: [],
+      isGameOver: false,
+      isWin: false,
     })
   },
 
-  getNextClue: async () => {
-    const { gameEngine } = get()
-    if (!gameEngine) {
-      console.error('❌ Game not initialized')
-      return null
-    }
+  revealClue: () => {
+    const { cluesRevealed, score } = get()
+    if (cluesRevealed < 4) {
+      // Degrade score: 100 -> 70 -> 40 -> 20
+      const newScore = cluesRevealed === 1 ? 70 : cluesRevealed === 2 ? 40 : 20
+      const newBlur = cluesRevealed === 1 ? 6 : cluesRevealed === 2 ? 3 : 0
 
-    const clue = await gameEngine.getCurrentClue()
-    const newGameState = gameEngine.getGameState()
-    const clueMode = gameEngine.getClueMode()
-    
-    set({ currentClue: clue, gameState: newGameState, clueMode })
-    return clue
-  },
-
-  revealFullMap: () => {
-    const { gameEngine, gameState } = get()
-    if (!gameEngine || !gameState) return
-
-    if (gameState.currentClueIndex >= gameState.targetCity.clues.length) {
-      gameEngine.revealFullMap()
-      const newGameState = gameEngine.getGameState()
-      set({ gameState: newGameState })
-    }
-  },
-
-  submitGuess: (guess: string) => {
-    const { gameEngine } = get()
-    if (!gameEngine) {
-      throw new Error('Game not initialized')
-    }
-
-    const result = gameEngine.submitGuess(guess)
-    const gameState = gameEngine.getGameState()
-
-    if (result.isCorrect && gameState.isGameWon) {
-      const { gameHistory } = get()
       set({
-        gameHistory: [
-          ...gameHistory,
-          {
-            city: gameState.targetCity.name,
-            score: gameState.score,
-            attempts: gameState.attempts,
-            cluesUsed: gameState.currentClueIndex,
-            timestamp: new Date()
-          }
-        ]
+        cluesRevealed: cluesRevealed + 1,
+        score: newScore,
+        mapBlurLevel: newBlur,
       })
     }
-
-    set({ gameState })
-    return result
   },
 
-  startNewGame: (difficulty = 'medium', gameMode = 'world') => {
-    const { gameEngine } = get()
-    if (!gameEngine) {
-      get().initializeGame(difficulty, gameMode)
-      return
+  makeGuess: (guess: string) => {
+    const { currentCity, lives, score } = get()
+    if (!currentCity) return false
+
+    // Normalize strings for comparison
+    const normalizedGuess = guess.toLowerCase().trim()
+    const normalizedCity = currentCity.name.toLowerCase().trim()
+
+    if (normalizedGuess === normalizedCity) {
+      // Correct guess
+      set({ isGameOver: true, isWin: true, mapBlurLevel: 0 })
+      return true
+    } else {
+      // Incorrect guess
+      const newLives = lives - 1
+      if (newLives <= 0) {
+        set({ isGameOver: true, isWin: false, lives: 0, mapBlurLevel: 0 })
+      } else {
+        set({ lives: newLives })
+      }
+      // Add to guesses history
+      set((state) => ({ guesses: [...state.guesses, guess] }))
+      return false
     }
-
-    const gameState = gameEngine.startNewGame(difficulty, gameMode)
-    const clueMode = gameEngine.getClueMode()
-    const currentClue = gameState.usedClues.length > 0 ? gameState.usedClues[0] : 'Welcome! Start guessing.'
-    
-    set({ gameState, currentClue, clueMode })
   },
 
-  getRemainingClues: () => {
-    const { gameEngine } = get()
-    return gameEngine ? gameEngine.getRemainingClues() : 0
+  resetGame: () => {
+    set({
+      isPlaying: false,
+      currentCity: null,
+      score: 100,
+      lives: 3,
+      cluesRevealed: 0,
+      guesses: [],
+      isGameOver: false,
+      isWin: false,
+    })
   },
-
-  getMapState: () => {
-    const { gameEngine } = get()
-    return gameEngine ? gameEngine.getMapState() : null
-  },
-
-  checkAIAvailability: async (): Promise<boolean> => {
-    const available = await clueManager.retryAIConnection()
-    set({ isAIAvailable: available, clueMode: available ? 'ai' : 'offline' })
-    return available
-  },
-
-  switchToOffline: () => {
-    clueManager.switchToOffline()
-    set({ clueMode: 'offline', isAIAvailable: false })
-  }
 }))

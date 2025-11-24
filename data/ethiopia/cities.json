@@ -1,56 +1,67 @@
-{
-  "cities": [
-    {
-      "name": "Addis Ababa",
-      "region": "Shewa",
-      "historicalSignificance": "Founded in 1886 by Emperor Menelik II, meaning 'New Flower' in Amharic",
-      "coordinates": { "lat": 9.0320, "lng": 38.7460 },
-      "culturalFacts": [
-        "Home to the African Union headquarters",
-        "Stands at 2,355 meters above sea level",
-        "Founded after Empress Taytu Betul found hot springs in the area"
-      ],
-      "myths": ["Named by Empress Taytu for the beautiful landscape"],
-      "landmarks": ["Mount Entoto", "Merkato", "Holy Trinity Cathedral"]
-    },
-    {
-      "name": "Lalibela",
-      "region": "Amhara", 
-      "historicalSignificance": "Famous for rock-hewn churches from 12th century, built by King Lalibela",
-      "coordinates": { "lat": 12.0317, "lng": 39.0410 },
-      "culturalFacts": [
-        "Churches carved from solid rock below ground level",
-        "UNESCO World Heritage site since 1978",
-        "Named after King Lalibela who envisioned a 'New Jerusalem'"
-      ],
-      "myths": ["Angels helped masons build the churches overnight"],
-      "landmarks": ["Bete Giyorgis", "Bete Medhane Alem", "Bete Maryam"]
-    },
-    {
-      "name": "Axum",
-      "region": "Tigray",
-      "historicalSignificance": "Ancient capital of the Aksumite Empire, home of the Ark of the Covenant",
-      "coordinates": { "lat": 14.1213, "lng": 38.7233 },
-      "culturalFacts": [
-        "Home to ancient obelisks and stelae",
-        "Believed to house the Ark of the Covenant",
-        "One of the oldest continuously inhabited cities in Africa"
-      ],
-      "myths": ["Founded by son of King Solomon and Queen of Sheba"],
-      "landmarks": ["Obelisk of Axum", "Church of Our Lady Mary of Zion", "King Ezana's Inscription"]
-    },
-    {
-      "name": "Gondar",
-      "region": "Amhara",
-      "historicalSignificance": "Former imperial capital known for its medieval castles and palaces",
-      "coordinates": { "lat": 12.6070, "lng": 37.4662 },
-      "culturalFacts": [
-        "Known as the 'Camelot of Africa'",
-        "Fasil Ghebbi fortress complex is UNESCO site",
-        "Home to the Debre Berhan Selassie Church with famous ceiling angels"
-      ],
-      "myths": ["Founded after Emperor Fasilides followed a buffalo to a holy spring"],
-      "landmarks": ["Fasil Ghebbi", "Royal Enclosure", "Bath of Fasilides"]
-    }
-  ]
-}
+[
+  {
+    "id": "e1",
+    "name": "Lalibela",
+    "region": "Amhara",
+    "coordinates": { "lat": 12.0317, "lng": 39.041 },
+    "clues": [
+      "I am home to eleven medieval monolithic cave churches carved out of rock.",
+      "My churches were built to be a 'New Jerusalem' after Muslim conquests halted pilgrimages.",
+      "The Church of St. George is my most famous structure, carved in the shape of a cross.",
+      "I am named after the Zagwe dynasty king who commissioned my construction."
+    ],
+    "hints": ["Rock-hewn", "Pilgrimage", "History"]
+  },
+  {
+    "id": "e2",
+    "name": "Addis Ababa",
+    "region": "Shewa",
+    "coordinates": { "lat": 9.032, "lng": 38.7445 },
+    "clues": [
+      "My name means 'New Flower' in Amharic.",
+      "I am the headquarters of the African Union and often called the 'political capital of Africa'.",
+      "I sit at the foot of Mount Entoto and enjoy a mild climate despite being near the equator.",
+      "I am home to 'Lucy', one of the oldest hominid skeletons ever found."
+    ],
+    "hints": ["Capital", "Diplomacy", "Highland"]
+  },
+  {
+    "id": "e3",
+    "name": "Axum",
+    "region": "Tigray",
+    "coordinates": { "lat": 14.1284, "lng": 38.7183 },
+    "clues": [
+      "I was the capital of an ancient empire that was a contemporary of Rome and Persia.",
+      "Legend says the Ark of the Covenant rests in my Church of Our Lady Mary of Zion.",
+      "My landscape is dotted with giant obelisks or stelae, marking royal tombs.",
+      "I am considered the holiest city in Ethiopia for Orthodox Christians."
+    ],
+    "hints": ["Ancient", "Obelisks", "Holy"]
+  },
+  {
+    "id": "e4",
+    "name": "Gondar",
+    "region": "Amhara",
+    "coordinates": { "lat": 12.6075, "lng": 37.4582 },
+    "clues": [
+      "I am known as the 'Camelot of Africa' due to my medieval castles.",
+      "I was the imperial capital of Ethiopia for over 200 years.",
+      "Fasil Ghebbi is my royal enclosure, a UNESCO World Heritage site.",
+      "My Debre Berhan Selassie church is famous for its ceiling of winged angel heads."
+    ],
+    "hints": ["Castles", "Imperial", "History"]
+  },
+  {
+    "id": "e5",
+    "name": "Harar",
+    "region": "Harari",
+    "coordinates": { "lat": 9.3149, "lng": 42.1226 },
+    "clues": [
+      "I am a walled city with 82 mosques and over 100 shrines.",
+      "I am famous for a nightly tradition where men feed wild hyenas by hand.",
+      "I am considered the fourth holiest city in Islam.",
+      "My old town is known as Jugol and is a maze of narrow alleyways."
+    ],
+    "hints": ["Walled", "Hyenas", "Islam"]
+  }
+]
