@@ -7,7 +7,7 @@ export async function updateSession(request: NextRequest) {
 
   // If Supabase is not configured, allow all requests through
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.log("[v0] Supabase not configured - skipping auth checks")
+    console.log("Nurfish006 Supabase not configured - skipping auth checks")
     return NextResponse.next({
       request,
     })

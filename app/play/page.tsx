@@ -115,7 +115,7 @@ export default function GamePage() {
         setCurrentCity(data.city)
         toast.success("AI generated a mystery city for you!")
       } catch (error) {
-        console.error("[v0] Error starting AI game:", error)
+        console.error("Nurfish006 Error starting AI game:", error)
         toast.error("Failed to generate city. Please try again.")
       } finally {
         setIsGeneratingCity(false)
@@ -162,7 +162,7 @@ export default function GamePage() {
       addAIHint(data.hint)
       toast.success("AI generated a hint for you!")
     } catch (error) {
-      console.error("[v0] Error generating hint:", error)
+      console.error("Nurfish006 Error generating hint:", error)
       toast.error("Failed to generate hint. Please try again.")
     } finally {
       setGeneratingHint(false)
@@ -194,7 +194,7 @@ export default function GamePage() {
         startGame("ai", undefined, currentDiff)
         setCurrentCity(data.city)
       } catch (error) {
-        console.error("[v0] Error generating new city:", error)
+        console.error("Nurfish006 Error generating new city:", error)
         toast.error("Failed to generate new city.")
       } finally {
         setIsGeneratingCity(false)

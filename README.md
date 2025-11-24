@@ -273,8 +273,8 @@ This project is licensed under the MIT License.
 
 ## 📧 Support
 
-For support, email support@citymystery.com or open an issue in the GitHub repository.
+For support, email nurfish06@gmail.com or open an issue in the GitHub repository.
 
 ---
 
-Built with ❤️ using v0 by Vercel
+

@@ -29,7 +29,7 @@ Return ONLY the hint text, nothing else.`
 
     return Response.json({ hint: text.trim() })
   } catch (error) {
-    console.error("[v0] Error generating hint:", error)
+    console.error("Nurfish006 Error generating hint:", error)
     return Response.json({ error: "Failed to generate hint" }, { status: 500 })
   }
 }

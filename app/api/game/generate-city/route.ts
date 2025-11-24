@@ -62,7 +62,7 @@ Requirements:
 
     return Response.json({ city })
   } catch (error) {
-    console.error("[v0] Error generating city:", error)
+    console.error("Nurfish006 Error generating city:", error)
     return Response.json({ error: "Failed to generate city" }, { status: 500 })
   }
 }
