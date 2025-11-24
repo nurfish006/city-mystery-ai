@@ -12,9 +12,6 @@ export default function PaymentSuccessPage() {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
   const [verificationData, setVerificationData] = useState<any>(null)
 
-  // Chapa redirects with tx_ref in the URL or sometimes as query param depending on config
-  // Standard return_url from our API was set to /payment/success
-  // Chapa might append ?trx_ref=... or ?tx_ref=...
   const txRef = searchParams.get("tx_ref") || searchParams.get("trx_ref")
 
   useEffect(() => {
@@ -31,7 +28,7 @@ export default function PaymentSuccessPage() {
         if (data.status === "success") {
           setStatus("success")
           setVerificationData(data.data)
-          // Here you would typically update the user's subscription status in your database
+          await updateSubscription(data.data)
         } else {
           setStatus("error")
         }
@@ -43,6 +40,22 @@ export default function PaymentSuccessPage() {
 
     verifyPayment()
   }, [txRef])
+
+  const updateSubscription = async (paymentData: any) => {
+    try {
+      await fetch("/api/payment/update-subscription", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tx_ref: txRef,
+          amount: paymentData.amount,
+          email: paymentData.email,
+        }),
+      })
+    } catch (error) {
+      console.error("Failed to update subscription:", error)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

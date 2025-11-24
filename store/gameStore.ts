@@ -13,7 +13,8 @@ export type City = {
 type GameState = {
   // Session
   isPlaying: boolean
-  gameMode: "world" | "ethiopia"
+  gameMode: "world" | "ethiopia" | "ai"
+  difficulty?: "easy" | "medium" | "hard"
   currentCity: City | null
 
   // Progress
@@ -27,16 +28,24 @@ type GameState = {
   isGameOver: boolean
   isWin: boolean
 
+  // AI features
+  aiHints: string[]
+  isGeneratingHint: boolean
+
   // Actions
-  startGame: (mode: "world" | "ethiopia", cities: City[]) => void
+  startGame: (mode: "world" | "ethiopia" | "ai", cities?: City[], difficulty?: "easy" | "medium" | "hard") => void
+  setCurrentCity: (city: City) => void
   revealClue: () => void
   makeGuess: (guess: string) => boolean
+  addAIHint: (hint: string) => void
+  setGeneratingHint: (generating: boolean) => void
   resetGame: () => void
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
   isPlaying: false,
   gameMode: "world",
+  difficulty: undefined,
   currentCity: null,
 
   score: 100,
@@ -48,26 +57,54 @@ export const useGameStore = create<GameState>((set, get) => ({
   isGameOver: false,
   isWin: false,
 
-  startGame: (mode, cities) => {
-    // Select random city
-    const randomCity = cities[Math.floor(Math.random() * cities.length)]
+  aiHints: [],
+  isGeneratingHint: false,
 
-    set({
-      isPlaying: true,
-      gameMode: mode,
-      currentCity: randomCity,
-      score: 100,
-      lives: 3,
-      cluesRevealed: 1, // Start with 1 clue
-      mapBlurLevel: 8,
-      guesses: [],
-      isGameOver: false,
-      isWin: false,
-    })
+  startGame: (mode, cities, difficulty) => {
+    if (mode === "ai") {
+      // For AI mode, we'll set the city externally via setCurrentCity
+      set({
+        isPlaying: true,
+        gameMode: mode,
+        difficulty: difficulty || "medium",
+        currentCity: null, // Will be set after generation
+        score: 100,
+        lives: 3,
+        cluesRevealed: 1,
+        mapBlurLevel: 8,
+        guesses: [],
+        isGameOver: false,
+        isWin: false,
+        aiHints: [],
+      })
+    } else {
+      // Original logic for static modes
+      if (!cities || cities.length === 0) return
+      const randomCity = cities[Math.floor(Math.random() * cities.length)]
+
+      set({
+        isPlaying: true,
+        gameMode: mode,
+        difficulty: undefined,
+        currentCity: randomCity,
+        score: 100,
+        lives: 3,
+        cluesRevealed: 1,
+        mapBlurLevel: 8,
+        guesses: [],
+        isGameOver: false,
+        isWin: false,
+        aiHints: [],
+      })
+    }
+  },
+
+  setCurrentCity: (city) => {
+    set({ currentCity: city })
   },
 
   revealClue: () => {
-    const { cluesRevealed, score } = get()
+    const { cluesRevealed } = get()
     if (cluesRevealed < 4) {
       // Degrade score: 100 -> 70 -> 40 -> 20
       const newScore = cluesRevealed === 1 ? 70 : cluesRevealed === 2 ? 40 : 20
@@ -82,7 +119,7 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   makeGuess: (guess: string) => {
-    const { currentCity, lives, score } = get()
+    const { currentCity, lives } = get()
     if (!currentCity) return false
 
     // Normalize strings for comparison
@@ -107,6 +144,14 @@ export const useGameStore = create<GameState>((set, get) => ({
     }
   },
 
+  addAIHint: (hint: string) => {
+    set((state) => ({ aiHints: [...state.aiHints, hint] }))
+  },
+
+  setGeneratingHint: (generating: boolean) => {
+    set({ isGeneratingHint: generating })
+  },
+
   resetGame: () => {
     set({
       isPlaying: false,
@@ -117,6 +162,8 @@ export const useGameStore = create<GameState>((set, get) => ({
       guesses: [],
       isGameOver: false,
       isWin: false,
+      aiHints: [],
+      isGeneratingHint: false,
     })
   },
 }))
