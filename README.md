@@ -1,5 +1,3 @@
-Here's the cleaned-up README without the Vercel references and screenshot:
-
 # 🌍 City Mystery AI Explorer
 
 An interactive geography mystery game where players guess cities based on AI-generated clues. Built with Next.js, Supabase, and modern web technologies.
