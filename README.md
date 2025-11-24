@@ -1,163 +1,280 @@
-GitHub README & Project Documentation
-🎯 City Mystery AI Explorer - Complete Project Overview
-🌍 City Mystery AI Explorer
-A modern, gamified web application that challenges players to guess hidden cities through cryptic clues, progressive map reveals, and AI-powered puzzles. Explore world geography and Ethiopian cultural heritage in an engaging, educational experience.
+# 🌍 City Mystery AI Explorer
 
-https://img.shields.io/badge/Game-Geography%2520Puzzle-blue
-https://img.shields.io/badge/Next.js-14-black
-https://img.shields.io/badge/TypeScript-5.0-blue
-https://img.shields.io/badge/AI-OpenAI-green
+An interactive geography mystery game where players guess cities based on AI-generated clues. Built with Next.js, Supabase, and the Vercel AI SDK.
 
-✨ Features
-🎮 Core Gameplay
-Progressive Clue System: 4 increasingly specific clues per city with strategic scoring
+![Game Screenshot](public/screenshots/game-play.jpg)
 
-Interactive Maps: Leaflet.js maps with blur reveal mechanics
+## ✨ Features
 
-Smart Validation: Close-match detection with helpful feedback
+### 🎮 Multiple Game Modes
 
-Multiple Difficulties: Easy, Medium, Hard with balanced challenges
+- **World Mode**: Explore cities from around the globe
+- **Ethiopia Legend Mode**: Discover Ethiopia's historic cities (Premium only)
+- **AI Mode**: Play with dynamically AI-generated cities and clues
 
-🤖 Intelligent Systems
-AI-Powered Clues: OpenAI GPT integration for dynamic, creative clues
+### 🎯 Gameplay Mechanics
 
-Offline Fallback: Robust JSON-based system when AI is unavailable
+- Progressive clue system (4 clues per city)
+- Dynamic scoring: 100 → 70 → 40 → 20 points based on clues used
+- Interactive map with progressive blur effect reveals location
+- 3 lives per game
+- AI-powered hint system for when you're stuck
 
-Smart Detection: Automatic AI availability checking and mode switching
+### 💎 Monetization
 
-🌍 Cultural Modes
-World Mode: General geographical and landmark-based clues
+- **Free Tier**: 5 games per day
+- **Watch Ads**: Earn bonus points to continue playing
+- **Premium Subscription**: 
+  - Unlimited games
+  - Ad-free experience
+  - Access to Ethiopia Legend Mode
+  - Exclusive features
 
-Ethiopia Legend Mode: Deep cultural, historical, and mythological content
+### 🔐 Authentication
 
-Educational Focus: Learn about Ethiopian heritage and world geography
+- Email/Password authentication via Supabase
+- Secure session management
+- User profile tracking
+- Game history and statistics
 
-🏆 Engagement Features
-City Cards Collectibles: Unlock virtual cards with city information
+### 💳 Payment Integration
 
-Leaderboard System: Compete with players globally
+- Chapa payment gateway integration
+- Multiple subscription tiers:
+  - Explorer (Free): 5 games/day
+  - Legend (Monthly): 99 ETB
+  - Guardian (Yearly): 999 ETB
+- Secure payment verification
 
-Progressive Scoring: Points degrade strategically with clues used
+## 🛠️ Tech Stack
 
-Game History: Track your progress and achievements
+- **Framework**: Next.js 16 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS v4
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **AI**: Vercel AI SDK (OpenAI models via AI Gateway)
+- **Payment**: Chapa Payment Gateway
+- **Maps**: Leaflet.js + React Leaflet
+- **State Management**: Zustand
+- **UI Components**: Radix UI + shadcn/ui
 
-🛠️ Technology Stack
-Framework: Next.js 14 with App Router
+## 📋 Prerequisites
 
-Language: TypeScript for type safety
+- Node.js 18+ and npm/yarn/pnpm
+- Supabase account
+- Chapa account (for payment processing)
+- Vercel account (optional, for deployment)
 
-Styling: Tailwind CSS + shadcn/ui components
+## 🚀 Getting Started
 
-State Management: Zustand for client state
+### 1. Clone the Repository
 
-Database: Supabase (PostgreSQL)
-
-Maps: Leaflet.js with OpenStreetMap
-
-AI: OpenAI GPT-3.5/4 integration
-
-Deployment: Vercel
-
-Authentication: Supabase Auth
-
-📁 Project Structure
-text
-city-mystery-ai/
-├── app/                    # Next.js App Router
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx           # Landing page
-│   ├── play/              # Game interface
-│   ├── leaderboard/       # Competition page
-│   ├── profile/           # User profile
-│   └── api/               # API routes
-├── components/
-│   ├── game/              # Game components
-│   ├── monetization/      # Premium features
-│   └── layout/            # UI components
-├── lib/
-│   ├── ai/                # AI clue generation
-│   ├── game/              # Game engine & logic
-│   └── utils/             # Utilities
-├── store/                 # Zustand state management
-├── data/                  # Static data files
-├── hooks/                 # Custom React hooks
-└── public/                # Static assets
-🚀 Quick Start
-Prerequisites
-Node.js 18+
-
-npm or yarn
-
-OpenAI API key (optional)
-
-Supabase account (free tier)
-
-Installation
-Clone the repository
-
-bash
-git clone https://github.com/your-username/city-mystery-ai.git
+\`\`\`bash
+git clone <your-repo-url>
 cd city-mystery-ai
-Install dependencies
+\`\`\`
 
-bash
+### 2. Install Dependencies
+
+\`\`\`bash
 npm install
-Environment setup
+# or
+yarn install
+# or
+pnpm install
+\`\`\`
 
-bash
-cp .env.local.example .env.local
-Edit .env.local with your keys:
+### 3. Set Up Environment Variables
 
-env
-# OpenAI (optional)
-OPENAI_API_KEY=sk-your-key-here
+Create a `.env.local` file in the root directory:
 
+\`\`\`env
 # Supabase
-NEXT_PUBLIC_SUPABASE_URL=your-project-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
-Run development server
+SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-bash
+# Supabase Auth Redirect (for development)
+NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=http://localhost:3000
+
+# Chapa Payment
+CHAPA_SECRET_KEY=your_chapa_secret_key
+
+# App URL
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+\`\`\`
+
+### 4. Set Up Supabase Database
+
+Run the SQL scripts in order from the `scripts/` folder in your Supabase SQL Editor:
+
+\`\`\`sql
+-- 1. Create users table
+-- Run: scripts/001_create_users_table.sql
+
+-- 2. Create ad views tracking table
+-- Run: scripts/002_create_ad_views_table.sql
+
+-- 3. Enable Row Level Security
+-- Run: scripts/003_enable_rls.sql
+\`\`\`
+
+### 5. Run the Development Server
+
+\`\`\`bash
 npm run dev
-Visit http://localhost:3000
+# or
+yarn dev
+# or
+pnpm dev
+\`\`\`
 
-🎮 How to Play
-Start a Game: Choose difficulty (Easy, Medium, Hard) and mode (World or Ethiopia)
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-Receive Clues: Get progressively clearer clues about a hidden city
+## 📁 Project Structure
 
-Use Maps: Watch the interactive map reveal details with each clue
+\`\`\`
+city-mystery-ai/
+├── app/
+│   ├── api/                    # API routes
+│   │   ├── ads/               # Ad reward endpoints
+│   │   ├── game/              # Game logic & AI generation
+│   │   ├── payment/           # Chapa payment integration
+│   │   └── user/              # User profile management
+│   ├── auth/                  # Authentication pages
+│   │   ├── login/
+│   │   └── sign-up/
+│   ├── payment/               # Payment success/failure pages
+│   ├── play/                  # Main game page
+│   ├── premium/               # Premium subscription page
+│   └── globals.css            # Global styles
+├── components/
+│   ├── ads/                   # Ad-related components
+│   ├── game/                  # Game UI components
+│   └── ui/                    # Reusable UI components (shadcn)
+├── data/
+│   ├── world/                 # World mode city data
+│   └── ethiopia/              # Ethiopia mode city data
+├── lib/
+│   ├── supabase/              # Supabase client utilities
+│   ├── chapa.ts               # Chapa payment utility
+│   └── utils.ts               # Helper functions
+├── store/
+│   └── gameStore.ts           # Zustand game state management
+├── scripts/                   # Database migration scripts
+└── middleware.ts              # Auth middleware
+\`\`\`
 
-Make Guesses: Submit city names with smart validation
+## 🎮 How to Play
 
-Earn Points: Score degrades with clues used - guess early for max points!
+1. **Choose a Mode**: Select World, Ethiopia Legend, or AI mode
+2. **Read the Clue**: Start with the first clue about the mystery city
+3. **Make a Guess**: Type your answer and submit
+4. **Use More Clues**: Reveal additional clues if needed (reduces points)
+5. **Win**: Guess correctly before running out of lives!
 
-Collect Cards: Unlock city cards with historical information
+### Game Mechanics
 
-Compete: Climb the leaderboard and track your progress
+- **Points System**:
+  - 1st clue: 100 points
+  - 2nd clue: 70 points
+  - 3rd clue: 40 points
+  - 4th clue: 20 points
 
-🧩 Game Modes
-🌐 World Mode
-Random cities from around the world
+- **Lives**: 3 attempts per game
+- **Map Feature**: Progressive blur effect (8px → 6px → 3px → 0px)
+- **AI Hints**: Available in AI mode for additional help
 
-Geographical and landmark-based clues
+## 💰 Premium Features
 
-Standard scoring system
+### Free Users
+- 5 games per day
+- World mode access
+- Watch ads to continue playing
+- Standard scoring system
 
-🇪🇹 Ethiopia Legend Mode
-Ethiopian cities and historical sites
+### Premium Users
+- Unlimited games
+- Ad-free experience
+- Ethiopia Legend Mode access
+- AI Mode with unlimited hints
+- Priority support
 
-Cultural, mythological, and historical clues
+## 🔒 Security
 
-Enhanced educational content
+- Row Level Security (RLS) enabled on all tables
+- Secure authentication with Supabase Auth
+- Server-side payment verification
+- Environment variables for sensitive data
+- Protected API routes
 
-Unique scoring bonuses
+## 🌐 Deployment
 
-🤖 AI Integration
-The game features a hybrid AI system:
+### Deploy to Vercel
 
-Primary: OpenAI GPT generates dynamic, creative clues
+1. Push your code to GitHub
+2. Import project in Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy!
 
-Fallback: JSON-based offline system ensures 100% uptime
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
-Smart Detection: Automatic mode switching based on API availability
+### Environment Variables in Production
+
+Make sure to add all environment variables from `.env.local` to your Vercel project settings.
+
+## 📊 Database Schema
+
+### Users Table
+\`\`\`sql
+- id (uuid, primary key)
+- email (text)
+- premium_status (boolean)
+- subscription_end (timestamp)
+- points (integer)
+- games_played_today (integer)
+- last_game_date (date)
+- created_at (timestamp)
+\`\`\`
+
+### Ad Views Table
+\`\`\`sql
+- id (uuid, primary key)
+- user_id (uuid, foreign key)
+- points_earned (integer)
+- created_at (timestamp)
+\`\`\`
+
+## 🧪 Testing Payment
+
+Use Chapa's test credentials:
+- Test Mode: Available in Chapa dashboard
+- Test Cards: Provided by Chapa documentation
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🙏 Acknowledgments
+
+- [Next.js](https://nextjs.org/)
+- [Supabase](https://supabase.com/)
+- [Vercel AI SDK](https://sdk.vercel.ai/)
+- [Chapa](https://chapa.co/)
+- [Leaflet.js](https://leafletjs.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
+
+## 📧 Support
+
+For support, email support@citymystery.com or open an issue in the GitHub repository.
+
+---
+
+Built with ❤️ using v0 by Vercel
