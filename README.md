@@ -1,8 +1,8 @@
+Here's the cleaned-up README without the Vercel references and screenshot:
+
 # 🌍 City Mystery AI Explorer
 
-An interactive geography mystery game where players guess cities based on AI-generated clues. Built with Next.js, Supabase, and the Vercel AI SDK.
-
-![Game Screenshot](public/screenshots/game-play.jpg)
+An interactive geography mystery game where players guess cities based on AI-generated clues. Built with Next.js, Supabase, and modern web technologies.
 
 ## ✨ Features
 
@@ -50,46 +50,41 @@ An interactive geography mystery game where players guess cities based on AI-gen
 
 - **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
-- **Styling**: Tailwind CSS v4
+- **Styling**: Tailwind CSS
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth
-- **AI**: Vercel AI SDK (OpenAI models via AI Gateway)
+- **AI**: OpenAI integration
 - **Payment**: Chapa Payment Gateway
 - **Maps**: Leaflet.js + React Leaflet
 - **State Management**: Zustand
-- **UI Components**: Radix UI + shadcn/ui
+- **UI Components**: Custom components with Tailwind CSS
 
 ## 📋 Prerequisites
 
 - Node.js 18+ and npm/yarn/pnpm
 - Supabase account
 - Chapa account (for payment processing)
-- Vercel account (optional, for deployment)
 
 ## 🚀 Getting Started
 
 ### 1. Clone the Repository
 
-\`\`\`bash
-git clone <your-repo-url>
+```bash
+git clone https://github.com/nurfish006/city-mystery-ai.git
 cd city-mystery-ai
-\`\`\`
+```
 
 ### 2. Install Dependencies
 
-\`\`\`bash
+```bash
 npm install
-# or
-yarn install
-# or
-pnpm install
-\`\`\`
+```
 
 ### 3. Set Up Environment Variables
 
 Create a `.env.local` file in the root directory:
 
-\`\`\`env
+```env
 # Supabase
 SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
@@ -105,13 +100,16 @@ CHAPA_SECRET_KEY=your_chapa_secret_key
 
 # App URL
 NEXT_PUBLIC_APP_URL=http://localhost:3000
-\`\`\`
+
+# OpenAI
+OPENAI_API_KEY=your_openai_api_key
+```
 
 ### 4. Set Up Supabase Database
 
 Run the SQL scripts in order from the `scripts/` folder in your Supabase SQL Editor:
 
-\`\`\`sql
+```sql
 -- 1. Create users table
 -- Run: scripts/001_create_users_table.sql
 
@@ -120,23 +118,19 @@ Run the SQL scripts in order from the `scripts/` folder in your Supabase SQL Edi
 
 -- 3. Enable Row Level Security
 -- Run: scripts/003_enable_rls.sql
-\`\`\`
+```
 
 ### 5. Run the Development Server
 
-\`\`\`bash
+```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-\`\`\`
+```
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📁 Project Structure
 
-\`\`\`
+```
 city-mystery-ai/
 ├── app/
 │   ├── api/                    # API routes
@@ -154,7 +148,7 @@ city-mystery-ai/
 ├── components/
 │   ├── ads/                   # Ad-related components
 │   ├── game/                  # Game UI components
-│   └── ui/                    # Reusable UI components (shadcn)
+│   └── ui/                    # Reusable UI components
 ├── data/
 │   ├── world/                 # World mode city data
 │   └── ethiopia/              # Ethiopia mode city data
@@ -166,7 +160,7 @@ city-mystery-ai/
 │   └── gameStore.ts           # Zustand game state management
 ├── scripts/                   # Database migration scripts
 └── middleware.ts              # Auth middleware
-\`\`\`
+```
 
 ## 🎮 How to Play
 
@@ -213,23 +207,21 @@ city-mystery-ai/
 
 ## 🌐 Deployment
 
-### Deploy to Vercel
+### Deploy to Vercel (Optional)
 
 1. Push your code to GitHub
 2. Import project in Vercel
 3. Add environment variables in Vercel dashboard
 4. Deploy!
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-
 ### Environment Variables in Production
 
-Make sure to add all environment variables from `.env.local` to your Vercel project settings.
+Make sure to add all environment variables from `.env.local` to your deployment platform.
 
 ## 📊 Database Schema
 
 ### Users Table
-\`\`\`sql
+```sql
 - id (uuid, primary key)
 - email (text)
 - premium_status (boolean)
@@ -238,15 +230,15 @@ Make sure to add all environment variables from `.env.local` to your Vercel proj
 - games_played_today (integer)
 - last_game_date (date)
 - created_at (timestamp)
-\`\`\`
+```
 
 ### Ad Views Table
-\`\`\`sql
+```sql
 - id (uuid, primary key)
 - user_id (uuid, foreign key)
 - points_earned (integer)
 - created_at (timestamp)
-\`\`\`
+```
 
 ## 🧪 Testing Payment
 
@@ -266,15 +258,14 @@ This project is licensed under the MIT License.
 
 - [Next.js](https://nextjs.org/)
 - [Supabase](https://supabase.com/)
-- [Vercel AI SDK](https://sdk.vercel.ai/)
+- [OpenAI](https://openai.com/)
 - [Chapa](https://chapa.co/)
 - [Leaflet.js](https://leafletjs.com/)
-- [shadcn/ui](https://ui.shadcn.com/)
 
 ## 📧 Support
 
-For support, email support@citymystery.com or open an issue in the GitHub repository.
+For support, open an issue in the GitHub repository.
 
 ---
 
-Built with ❤️ using v0 by Vercel
+Built by [Nurahmed](https://github.com/nurfish006)
